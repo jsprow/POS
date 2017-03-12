@@ -13,7 +13,9 @@
   "scripts": {
     "test": "xo",
     "start": "electron .",
-    "build": "electron-packager . --out=dist --asar --overwrite --all"
+    "build": "electron-packager . --out=dist --asar --overwrite --all",
+    "build-js": "rollup -c -f iife connect.js -o main.js",
+    "uglify-js": "uglifyjs main.js -cmo main.min.js"
   },
   "files": [
     "index.js",
@@ -26,13 +28,12 @@
   ],
   "dependencies": {
     "electron-debug": "^1.0.0",
-    "http-post": "^0.1.1"
+    "jquery": "^3.1.1"
   },
   "devDependencies": {
     "devtron": "^1.1.0",
     "electron": "^1.0.1",
     "electron-packager": "^8.0.0",
-    "electron-window-manager": "^1.0.4",
     "xo": "^0.16.0"
   },
   "xo": {

@@ -10,9 +10,43 @@ body {
 	margin: 0;
 	padding-top: 50px;
 	background-color: #fff;
+	display: flex;
+	flex-flow: column wrap;
+	justify-content: space-between;
+	align-items: center;
+}
+.main-body {
+	overflow: hidden;
+}
+.to-hide {
+	height: auto;
+	margin: 0 auto;
+	opacity: 1;
+	transition: all 200ms;
+}
+div.hidden {
+	height: 0;
+	overflow: hidden;
+	opacity: 0;
+	transition: all 200ms;
+}
+.hide-button {
+	position: absolute;
+	top: 10px;
+	left: 10px;
+	width: 20px;
+	height: 20px;
+	padding: 0;
+	margin: 0;
+}
+.hide-button:before {
+	content: '-';
+}
+.hide-button.hidden:before {
+	content: '+';
 }
 h1 {
-	margin: 0 10px 20px 10px;
+	text-align: center;
 }
 .dragbar {
 	position: fixed;
@@ -43,9 +77,6 @@ h1 {
 	-ms-user-select: none;
 	user-select: none;
 }
-.ud {
-	transform: rotate(90deg) translate(5px, -5.5px);
-}
 .box {
 	position: relative;
 	display: flex;
@@ -53,17 +84,18 @@ h1 {
 	justify-content: space-between;
 	align-items: center;
 	min-height: 30px;
-	margin: 10px 10px;
+	margin: 10px auto 0 auto;
 }
 .pause-box {
 	text-align: right;
 	position: absolute;
-	top: -20px;
+	top: -5px;
 	right: 10px;
 	color: #6d68cc;
 }
 p {
-	width: 150px;
+	width: 130px;
+	margin: 0;
 }
 span {
 	width: 190px;
@@ -73,36 +105,51 @@ span {
 	margin-right: auto;
 }
 input {
+	color: #444;
 	font-family: inherit;
-	font-size: inherit;
+	font-size: 12px;
 	min-width: 180px;
 	max-width: 180px;
 	min-height: 15px;
-	padding: 2px;
+	padding: 4px;
+	padding-right: 0;
 }
-input:invalid {
-	outline-color: darkred;
+input:focus:valid {
+	outline: 2px solid #35bf51;
+}
+input:invalid,
+input:focus:invalid {
+	outline: 2px solid #bf3549;
+}
+.points-qty {
+	max-width: 60px;
+	min-width: 60px;
+	margin-right: 10px;
+}
+input::-webkit-input-placeholder {
+	color: #bbb;
 }
 button {
 	background-color: #fff;
-	border: none;
-	outline: 1px solid #777;
+	border: 1px solid #777;
+	border-radius: 5px;
+	outline: none;
 	font-family: inherit;
 	color: #777;
 	font-size: 14px;
-	margin: 5px;
-	padding: 4px;
+	margin: 5px 10px 5px 0;
+	padding: 5px;
 	transition: all 100ms;
 }
 button:hover {
 	background-color: #eee;
-	outline-color: #555;
+	border-color: #555;
 	color: #555;
 	transition: all 100ms;
 }
 button:active {
 	background-color: #ddd;
-	outline-color: #333;
+	border-color: #333;
 	color: #333;
 	transition: all 100ms;
 }
@@ -115,17 +162,26 @@ tbody,
 tr {
 	width: 660px;
 }
+thead {
+	font-size: 1.1em;
+}
+tbody tr:nth-of-type(2n-1) {
+	background-color: #eee;
+}
 table {
-	margin: 20px;
+	margin: 20px auto;
+	height: 300px;
+	overflow-y: scroll;
 }
 td,
 th {
-	width: min-content;
+	max-width: max-content;
 	text-align: left;
+	padding: 10px;
 }
 .close-btn {
 	cursor: pointer;
-	position: absolute;
+	position: fixed;
 	top: 5px;
 	right: 5px;
 	width: 30px;

@@ -5,36 +5,50 @@ const electron = require('electron'),
 
 global.path = app.getPath('userData');
 
-// adds event listener for the log modal open/close events
 ipcMain.on('open-second-window', (event, arg)=> {
-    logWindow.show();
+  logWindow = createLogModal();
 });
+ipcMain.on('asynchronous-message', (event, arg)=> {
+	console.log('said', arg);
+	event.sender.send('synchronous-reply', 'refresh');
+});
+
 ipcMain.on('close-second-window', (event, arg)=> {
-    logWindow.hide();
+  logWindow.hide();
 });
-// adds debug features like hotkeys for triggering dev tools and reload
+ipcMain.on('shrink-window', (event, arg)=> {
+	mainWindow.setSize(400, 160, true);
+	console.log('heard shrink');
+});
+ipcMain.on('grow-window', (event, arg)=> {
+	console.log('heard grow');
+	mainWindow.setSize(400, 500, true);
+});
+
 require('electron-debug')();
 
-// prevent window being garbage collected
 let mainWindow;
 let logWindow;
 
 function onClosed() {
-	// dereference the window
-	// for multiple windows store them in an array
 	mainWindow = null;
 	logWindow = null;
 }
 
 function createMainWindow() {
 	const win = new electron.BrowserWindow({
-		backgroundColor: '#ffffff',
-		width: 400,
-		height: 700,
-		frame: false,
-		x: 0,
-		y: 0,
-		title: 'Loyalty Integration'
+				backgroundColor: '#ffffff',
+				width: 400,
+				height: 500,
+				frame: false,
+				x: 0,
+				y: 0,
+				title: 'Rewards App',
+				show: false
+	});
+	win.setAlwaysOnTop(true);
+	win.once('ready-to-show', () => {
+	  win.show();
 	});
 
 	win.loadURL(`file://${__dirname}/index.html`);
@@ -44,18 +58,19 @@ function createMainWindow() {
 }
 function createLogModal() {
 	const log = new electron.BrowserWindow({
-		parent: mainWindow,
-		width: 700,
-		height: 500,
-		modal: true,
-		show: false,
-		frame: false
+				parent: mainWindow,
+				width: 900,
+				height: 500,
+				modal: true,
+				show: false,
+				frame: false
 	});
 
 	log.loadURL(`file://${__dirname}/log.html`);
-	// log.once('ready-to-show', () => {
-	// 	log.show();
-	// });
+	
+	log.once('ready-to-show', () => {
+	  log.show();
+	});
 	return log;
 }
 
@@ -69,13 +84,9 @@ app.on('activate', () => {
 	if (!mainWindow) {
 		mainWindow = createMainWindow();
 	}
-	if (!logModal) {
-		logWindow = createLogModal();
-	}
 });
 
 app.on('ready', () => {
 	mainWindow = createMainWindow();
 	//mainWindow.webContents.openDevTools();
-	logWindow = createLogModal();
 });

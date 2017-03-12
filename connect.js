@@ -2,8 +2,9 @@ const remote = require('electron').remote,
 			path = remote.getGlobal('path'),
 			{ipcRenderer} = require('electron'),
 			http = require('http'),
-			http_post = require('http-post'),
-			fs = require('fs');
+			https = require('https'),
+			fs = require('fs'),
+      $ = require('jquery'),
 
 			user = "{132643DA-4EFF-439C-847E-4AD7554D3D7A}",
 			kiosk = "{9ABD7B37-35FE-4174-B2D5-85A2A9B92693}",
@@ -16,43 +17,58 @@ const remote = require('electron').remote,
 			mobile = document.getElementById('mobile'),
 			email = document.getElementById('email'),
 
-			submit = document.getElementById('submit'),
-			pointButton = document.getElementById('points'),
+			logButton = document.getElementById('logModalButton'),
+			submitButton = document.getElementById('submitButton'),
+			pointButton = document.getElementById('pointsButton'),
+      hideButton = document.getElementById('hideButton'),
 			pauseBox = document.getElementById('pauseBox');
 
 var post_mobile = [],
-		logButton = document.getElementById('logModalButton'),
-		isPaused = false;
-
-
-	var inputs = document.getElementsByTagName('input'),
-	timer = window.setInterval(function() {
-		if (!isPaused) {
-			getStuff();
-		}
-	}, 10000);
-
-function logModal() {
-		ipcRenderer.messaging = {
-			sendOpenLogWindow: function() {
-				ipcRenderer.send('open-second-window', 'an-argument')
-			},
-			sendCloseLogWindow: function() {
-				ipcRenderer.send('close-second-window', 'an-argument')
-			},
-
-			init: function() {
-				logButton.addEventListener('click', function() {
-					ipcRenderer.messaging.sendOpenLogWindow();
-				});
+		isPaused = false,
+		inputs = document.getElementsByTagName('input'),
+		timer = window.setInterval(function() {
+			if (!isPaused) {
+				getStuff();
 			}
-		};
-    ipcRenderer.messaging.init();
+		}, 10000);
+
+function ipcFunction() {
+	ipcRenderer.messaging = {
+    sendShrink: function() {
+			ipcRenderer.send('shrink-window', 'an-argument')
+		},
+		sendGrow: function() {
+			ipcRenderer.send('grow-window', 'an-argument')
+		},
+		sendOpenLogWindow: function() {
+			ipcRenderer.send('open-second-window', 'an-argument')
+		},
+		sendCloseLogWindow: function() {
+			ipcRenderer.send('close-second-window', 'an-argument')
+		},
+
+		init: function() {
+      var shrunk = false;
+			hideButton.addEventListener('click', function() {
+        if (!shrunk) {
+          $('.to-hide').addClass('hidden');
+  				ipcRenderer.messaging.sendShrink();
+          shrunk = true;
+        } else {
+          $('.to-hide').removeClass('hidden');
+          ipcRenderer.messaging.sendGrow();
+          shrunk = false;
+        }
+			});
+			logButton.addEventListener('click', function() {
+				ipcRenderer.messaging.sendOpenLogWindow();
+			});
+		}
+	};
+  ipcRenderer.messaging.init();
 }
 
-logModal();
-
-console.log(path);
+ipcFunction();
 
 Element.prototype.setAttributes = function (attrs) {
     for (var idx in attrs) {
@@ -89,7 +105,7 @@ function getStuff() {
 		});
 		res.on('end', function () {
 			try {
-				let parsedData = JSON.parse(rawData),
+				var parsedData = JSON.parse(rawData),
 					phone = parsedData.mobile.toString(),
 					phoneArea = phone.substring(0, 3),
 					phoneThree = phone.substring(3, 6),
@@ -98,70 +114,27 @@ function getStuff() {
 
 				post_mobile[0] = parsedData.mobile;
 
-				if (parsedData.firstname === undefined) {
-					let input = document.createElement('input'),
-						child = first.firstChild;
-					input.setAttributes({
-					    'id':'firstInput',
-					    'placeholder': 'First Name'
-					});
-					first.innerHTML = '';
-					first.appendChild(input);
-				} else {
-					first.innerHTML = parsedData.firstname;
+				function inputGen(parsedKey, element, inputId, placeholder, type) {
+					if (parsedKey === undefined) {
+						var input = document.createElement('input'),
+						child = element.firstChild;
+						input.setAttributes({
+							'id': inputId,
+							'placeholder': placeholder,
+							'type': type
+						});
+						element.innerHTML = '';
+						element.appendChild(input);
+					} else {
+						element.innerHTML = parsedKey;
+					}
 				}
+				inputGen(parsedData.firstname, first, 'firstInput', 'First Name', '');
+				inputGen(parsedData.lastname, last, 'lastInput', 'Last Name', '');
+				inputGen(parsedData.birthdate, birthdate, 'birthdateInput', '', 'date');
+				inputGen(parsedPhone, mobile, 'mobileInput', '5555555555', 'tel');
+				inputGen(parsedData.email, email, 'emailInput', 'name@example.com', 'email');
 
-				if (parsedData.lastname === undefined) {
-					let input = document.createElement('input'),
-						child = last.firstChild;
-					input.setAttributes({
-					    'id':'lastInput',
-					    'placeholder': 'Last Name'
-					});
-					last.innerHTML = '';
-					last.appendChild(input);
-				} else {
-					last.innerHTML = parsedData.lastname;
-				}
-
-				if (parsedData.birthdate === undefined) {
-					let input = document.createElement('input'),
-						child = birthdate.firstChild;
-					input.setAttributes({
-					    'id':'birthdateInput',
-							'type': 'date'
-					});
-					birthdate.innerHTML = '';
-					birthdate.appendChild(input);
-				} else {
-					birthdate.innerHTML = parsedData.birthdate;
-				}
-
-				if (parsedData.mobile === undefined) {
-					let input = document.createElement('input'),
-						child = mobile.firstChild;
-					input.setAttributes({
-					    'id':'mobileInput',
-							'type': 'tel'
-					});
-					mobile.innerHTML = '';
-					mobile.appendChild(input);
-				} else {
-					mobile.innerHTML = parsedPhone;
-				}
-
-				if (parsedData.email === undefined) {
-					let input = document.createElement('input'),
-						child = email.firstChild;
-					input.setAttributes({
-							'id':'emailInput',
-							'type': 'email'
-					});
-					email.innerHTML = '';
-					email.appendChild(input);
-				} else {
-					email.innerHTML = parsedData.email;
-				}
 				for (var i = 0; i < inputs.length; i++) {
 					inputs[i].addEventListener('click', function() {
 						isPaused = true;
@@ -188,26 +161,32 @@ getStuff();
 
 function pushStuff() {
 	if (document.getElementById('firstInput') != null) {
-		var post_first = '&firstname=' + document.getElementById('firstInput').value;
+		var post_first = document.getElementById('firstInput').value;
 	} else {
 		var post_first = '';
 	}
 	if (document.getElementById('lastInput') != null) {
-		var post_last = '&lastname=' + document.getElementById('lastInput').value;
+		var post_last = document.getElementById('lastInput').value;
 	} else {
 		var post_last = '';
 	}
 	if (document.getElementById('birthdateInput') != null) {
-		var post_birthdate = '&birthdate=' + document.getElementById('birthdateInput').value;
+		var post_birthdate = document.getElementById('birthdateInput').value;
 	} else {
 		var post_birthdate = '';
 	}
 	if (document.getElementById('emailInput') != null) {
-		var post_email = '&email=' + document.getElementById('emailInput').value;
+		var post_email = document.getElementById('emailInput').value;
 	} else {
 		var post_email = '';
 	}
-	let timeStamp = new Date(),
+	let time = new Date,
+			month = time.getMonth(),
+			date = time.getDate(),
+			year = time.getFullYear(),
+			hour = time.getHours(),
+			min = (time.getMinutes() < 10 ? '0' : '') + time.getMinutes(),
+			timeStamp = month+"/"+date+"/"+year+" "+hour+":"+min;
 			postData = JSON.stringify({
 				'timestamp': timeStamp,
 				'mobile': post_mobile[0],
@@ -220,7 +199,7 @@ function pushStuff() {
 		if (err) throw err;
 	});
 	console.log(post_first, post_last, post_birthdate, post_email, post_mobile[0]);
-	http_post('http://www.repleotech.com/gateway/contactmanager.asp?user_guid=' + user + '&campaign=' + campaign + '&keyword=' + keyword + post_first + post_last + post_birthdate + post_email + '&mobile='  + post_mobile[0], function (res) {
+	http.get('http://www.repleotech.com/gateway/contactmanager.asp?user_guid=' + user + '&campaign=' + campaign + '&keyword=' + keyword + '&firstname=' + post_first + '&lastname=' + post_last + '&birthdate=' + post_birthdate + '&email=' + post_email + '&mobile=' + post_mobile[0], function (res) {
 		var statusCode = res.statusCode,
 			contentType = res.headers['content-type'];
 		var error;
@@ -234,15 +213,48 @@ function pushStuff() {
 			return
 		}
 		res.setEncoding('utf8');
-		console.log(res.message);
+		var rawData = '';
+		res.on('data', function (chunk) {
+			console.log(rawData += chunk);
+		});
+	});
+}
+pointsButton.addEventListener('click', function() {
+	let pointsQty = document.getElementById('pointsQty');
+	if (pointsQty.checkValidity()) {
+		var post_qty = pointsQty.value;
+		console.log(post_qty);
+		givePoints(post_qty);
+	} else {
+		pointsQty.setAttribute('invalid', '');
+	}
+});
+function givePoints(qty) {
+	http.get('http://www.repleotech.com/gateway/kiosk_submission.asp?user_guid=' + user + '&kiosk=' + keyword + '&mobile=2693529412' + /* todo replace my number with post_mobile[0] + */ '&submission_type=loyalty&quantity=' + qty, function(res) {
+
+		/* todo use &submission_type=loyalty or =datacapture ? */
+
+		var statusCode = res.statusCode,
+			contentType = res.headers['content-type'];
+		var error;
+		if (statusCode !== 200) {
+			error = new Error("Request Failed.\n" +
+				"Status Code: " + statusCode);
+		}
+		if (error) {
+			console.log(error.message);
+			res.resume();
+			return
+		}
+		res.setEncoding('utf8');
+		var rawData = '';
+		res.on('data', function (chunk) {
+			console.log(rawData += chunk);
+		});
 	});
 }
 
-function givePoints() {
-
-}
-
-submit.addEventListener('click', function () {
+submitButton.addEventListener('click', function () {
 	pushStuff();
 	getStuff();
 	isPaused = false;

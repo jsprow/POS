@@ -8,32 +8,37 @@
   <link rel="stylesheet" href="index.css">
 </head>
 
-<body>
+<body class="main-body">
   <div class="dragbar">
+    <button class="hide-button to-hide" id="hideButton"></button>
     <img src="drag.svg" alt="drag">
   </div>
-  <h1>Well look who it is...</h1>
-  <div class="box">
-    <button id="refresh">Refresh</button>
-    <button id="logModalButton">Log</button>
+  <div class="to-hide">
+    <div class="box">
+      <button id="refresh">Refresh Page</button>
+      <button id="logModalButton">Open Log</button>
+      <p id="pauseBox" class="pause-box"></p>
+    </div>
   </div>
   <div class="box">
-    <p>First:</p>
+    <p>First Name:</p>
     <span id="first">
       <span></span>
     </span>
   </div>
-  <div class="box">
-    <p>Last:</p>
-    <span id="last">
-      <span></span>
-    </span>
-  </div>
-  <div class="box">
-    <p>Birthdate:</p>
-    <span id="birthdate">
-      <span></span>
-    </span>
+  <div class="to-hide">
+    <div class="box">
+      <p>Last Name:</p>
+      <span id="last">
+        <span></span>
+      </span>
+    </div>
+    <div class="box">
+      <p>Birthdate:</p>
+      <span id="birthdate">
+        <span></span>
+      </span>
+    </div>
   </div>
   <div class="box">
     <p>Phone:</p>
@@ -41,26 +46,22 @@
       <span></span>
     </span>
   </div>
-  <div class="box">
-    <p>Email:</p>
-    <span id="email">
-      <span></span>
-    </span>
+  <div class="to-hide">
+    <div class="box">
+      <p>Email:</p>
+      <span id="email">
+        <span></span>
+      </span>
+    </div>
+    <div class="box">
+      <button id="submitButton">Update Info</button>
+    </div>
+    <div class="box">
+      <p>Loyalty Points:</p>
+      <input id="pointsQty" class="points-qty" type="number" min="0" max="10">
+      <button id="pointsButton">Add Points</button>
+    </div>
   </div>
-  <div class="box">
-    <button id="submit">Submit</button>
-    <p id="pauseBox" class="pause-box"></p>
-  </div>
-  <div class="box">
-    <p>Loyalty Points:</p>
-    <span>
-      <input id="points" type="number">
-    </span>
-  </div>
-  <div class="box">
-    <button id="pointsButton">Submit</button>
-  </div>
-
 	<script src="connect.js"></script>
 </body>
 

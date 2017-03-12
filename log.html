@@ -11,7 +11,7 @@
 <body>
   <a id="close" class="close-btn">&#10006;</a>
 
-  <h1>Well look who it is...</h1>
+  <h1>Who are these people!?</h1>
   <table>
     <thead>
       <tr>
@@ -33,6 +33,12 @@
     var logTable = document.getElementById('logTable');
     var logArr = [];
 
+    ipcRenderer.on('synchronous-reply', (event, arg)=> {
+      readLog();
+      console.log('heard', arg);
+    });
+    ipcRenderer.send('asynchronous-message', 'ping');
+
     function logModal() {
   		ipcRenderer.messaging = {
   			sendCloseLogWindow: function() {
@@ -47,9 +53,7 @@
   		};
       ipcRenderer.messaging.init();
     }
-
     logModal();
-
     function readLog() {
       logTable.innerHTML = '';
     	fs.readFile(path + '/log.txt', 'utf8', (err, data) => {
@@ -95,8 +99,6 @@
     		}
     	});
     }
-    readLog();
-    setInterval(readLog, 10000);
   </script>
 </body>
 

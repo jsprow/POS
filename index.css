@@ -92,16 +92,19 @@ button {
 	font-size: 14px;
 	margin: 5px;
 	padding: 4px;
+	transition: all 100ms;
 }
 button:hover {
 	background-color: #eee;
 	outline-color: #555;
 	color: #555;
+	transition: all 100ms;
 }
 button:active {
 	background-color: #ddd;
 	outline-color: #333;
 	color: #333;
+	transition: all 100ms;
 }
 button:last-of-type {
 	margin-right: auto;

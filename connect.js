@@ -187,12 +187,27 @@ refreshBtn.addEventListener('click', function () {
 getStuff();
 
 function pushStuff() {
-	var post_first = document.getElementById('firstInput').value,
-		post_last = document.getElementById('lastInput').value,
-		post_birthdate = document.getElementById('birthdateInput').value,
-		post_email = document.getElementById('emailInput').value;
-
-		let timeStamp = new Date(),
+	if (document.getElementById('firstInput') != null) {
+		var post_first = '&firstname=' + document.getElementById('firstInput').value;
+	} else {
+		var post_first = '';
+	}
+	if (document.getElementById('lastInput') != null) {
+		var post_last = '&lastname=' + document.getElementById('lastInput').value;
+	} else {
+		var post_last = '';
+	}
+	if (document.getElementById('birthdateInput') != null) {
+		var post_birthdate = '&birthdate=' + document.getElementById('birthdateInput').value;
+	} else {
+		var post_birthdate = '';
+	}
+	if (document.getElementById('emailInput') != null) {
+		var post_email = '&email=' + document.getElementById('emailInput').value;
+	} else {
+		var post_email = '';
+	}
+	let timeStamp = new Date(),
 			postData = JSON.stringify({
 				'timestamp': timeStamp,
 				'mobile': post_mobile[0],
@@ -201,22 +216,25 @@ function pushStuff() {
 				'birthdate': post_birthdate,
 				'email': post_email
 			});
-		fs.appendFile(path + '/log.txt', postData + '\n', (err) => {
-			if (err) throw err;
-			console.log('The "data to append" was appended to' + path + '/log.txt');
-		});
-	http_post('http://www.repleotech.com/gateway/contactmanager.asp?user_guid=' + user + '&campaign=' + campaign + '&keyword=' + keyword + '&firstname=' + post_first + '&mobile=2693529412' /* + post_mobile[0] */ , function (res) {
-		response.setEncoding('utf8');
-		res.on('data', function (e) {
-		});
-		res.on('end', function () {
-			try {
-			} catch (e) {
-				console.log(e.message);
-			}
-		})
-	}).on('error', function (e) {
-		console.log("Got error: " + (e.message));
+	fs.appendFile(path + '/log.txt', postData + '\n', (err) => {
+		if (err) throw err;
+	});
+	console.log(post_first, post_last, post_birthdate, post_email, post_mobile[0]);
+	http_post('http://www.repleotech.com/gateway/contactmanager.asp?user_guid=' + user + '&campaign=' + campaign + '&keyword=' + keyword + post_first + post_last + post_birthdate + post_email + '&mobile='  + post_mobile[0], function (res) {
+		var statusCode = res.statusCode,
+			contentType = res.headers['content-type'];
+		var error;
+		if (statusCode !== 200) {
+			error = new Error("Request Failed.\n" +
+				"Status Code: " + statusCode);
+		}
+		if (error) {
+			console.log(error.message);
+			res.resume();
+			return
+		}
+		res.setEncoding('utf8');
+		console.log(res.message);
 	});
 }
 

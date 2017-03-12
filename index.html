@@ -9,21 +9,57 @@
 </head>
 
 <body>
+  <div class="dragbar">
+    <p class="lr">&harr;</p>
+    <p class="ud">&harr;</p>
+  </div>
   <h1>Well look who it is...</h1>
   <div class="box">
-    <p>First:</p><span id="first"></span></div>
+    <p>First:</p>
+    <span id="first">
+      <span></span>
+    </span>
+  </div>
   <div class="box">
-    <p>Last:</p><span id="last"></span></div>
+    <p>Last:</p>
+    <span id="last">
+      <span></span>
+    </span>
+  </div>
   <div class="box">
-    <p>Birthdate:</p><span id="birthdate"></span></div>
+    <p>Birthdate:</p>
+    <span id="birthdate">
+      <span></span>
+    </span>
+  </div>
   <div class="box">
-    <p>Phone:</p><span id="mobile"></span></div>
+    <p>Phone:</p>
+    <span id="mobile">
+      <span></span>
+    </span>
+  </div>
   <div class="box">
-    <p>Email:</p><span id="email"></span></div>
-	
-	<button id="refresh">Refresh</button>
-	<button id="submit">submit</button>
-	
+    <p>Email:</p>
+    <span id="email">
+      <span></span>
+    </span>
+  </div>
+  <div class="box">
+    <button id="refresh">Refresh</button>
+    <button id="submit">Submit</button>
+    <p id="pauseBox" class="pause-box"></p>
+  </div>
+  <div class="box">
+    <p>Loyalty Points:</p>
+    <span>
+      <input id="points" type="number">
+    </span>
+  </div>
+  <div class="box">
+    <button id="pointsButton">Submit</button>
+    <button id="logModalButton">Log</button>
+  </div>
+
 	<script src="connect.js"></script>
 </body>
 

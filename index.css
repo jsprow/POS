@@ -1,25 +1,147 @@
-body {
-	font-family: 'Open Sans', sans-serif;
-	width: 280px;
-	height: 280px;
-	margin: 0;
-	padding: 15px
+@font-face {
+	font-family: 'Slabo13';
+	src: url('Slabo13px-Regular.eot?#iefix') format('embedded-opentype'),
+		url('Slabo13px-Regular.ttf') format('truetype');
 }
 
+body {
+	font-family: 'Slabo13', 'Garamond', serif;
+	font-size: 16px;
+	margin: 0;
+	padding-top: 50px;
+	background-color: #fff;
+}
+h1 {
+	margin: 0 10px 20px 10px;
+}
+.dragbar {
+	position: fixed;
+	top: 0;
+	left: 0;
+	width: 100%;
+	height: 40px;
+	background-color: #eee;
+	-webkit-app-region: drag;
+	color: #aaa;
+	z-index: 10;
+	transition: background-color 100ms, color 100ms;
+}
+.dragbar:hover {
+	background-color: #ddd;
+	color: #999;
+	transition: background-color 100ms, color 100ms;
+}
+.dragbar:active {
+	background-color: #ccc;
+	color: #888;
+	transition: background-color 100ms, color 100ms;
+}
+.dragbar > p {
+	cursor: default;
+	position: absolute;
+	top: 0;
+	right: 5px;
+	width: 30px;
+	height: 30px;
+	margin: 0;
+	font-size: 30px;
+	color: inherit;
+	-webkit-user-select: none;
+	-moz-user-select: none;
+	-ms-user-select: none;
+	user-select: none;
+}
+.ud {
+	transform: rotate(90deg) translate(5px, -5.5px);
+}
 .box {
+	position: relative;
 	display: flex;
 	flex-flow: row nowrap;
-	align-items: center
+	justify-content: space-between;
+	align-items: center;
+	min-height: 30px;
+	margin: 10px 10px;
 }
-
+.pause-box {
+	text-align: right;
+	position: absolute;
+	top: -20px;
+	right: 10px;
+	color: #6d68cc;
+}
 p {
-	width: 90px;
-	margin: 5px 0
+	width: 150px;
 }
-
 span {
-	width: 170px;
+	width: 190px;
 	white-space: nowrap;
 	overflow: hidden;
-	text-overflow: ellipsis
+	text-overflow: ellipsis;
+	margin-right: auto;
+}
+input {
+	font-family: inherit;
+	font-size: inherit;
+	min-width: 180px;
+	max-width: 180px;
+	min-height: 15px;
+	padding: 2px;
+}
+input:invalid {
+	outline-color: darkred;
+}
+button {
+	background-color: #fff;
+	border: none;
+	outline: 1px solid #777;
+	font-family: inherit;
+	color: #777;
+	font-size: 14px;
+	margin: 5px;
+	padding: 4px;
+}
+button:hover {
+	background-color: #eee;
+	outline-color: #555;
+	color: #555;
+}
+button:active {
+	background-color: #ddd;
+	outline-color: #333;
+	color: #333;
+}
+button:last-of-type {
+	margin-right: auto;
+}
+table,
+thead,
+tbody,
+tr {
+	width: 660px;
+}
+table {
+	margin: 20px;
+}
+td,
+th {
+	width: min-content;
+	text-align: left;
+}
+.close-btn {
+	cursor: pointer;
+	position: absolute;
+	top: 5px;
+	right: 5px;
+	width: 30px;
+	height: 30px;
+	margin: 0;
+	font-size: 30px;
+	color: #777;
+}
+.close-btn:hover {
+	color: #555;
+}
+.close-btn:active {
+	color: #333;
 }

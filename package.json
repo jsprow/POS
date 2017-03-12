@@ -1,7 +1,7 @@
 {
-  "name": "app",
-  "productName": "App",
-  "version": "0.0.0",
+  "name": "rewards app",
+  "productName": "Rewards App",
+  "version": "0.1.0",
   "description": "",
   "license": "MIT",
   "repository": "user/repo",
@@ -25,12 +25,14 @@
     "electron"
   ],
   "dependencies": {
-    "electron-debug": "^1.0.0"
+    "electron-debug": "^1.0.0",
+    "http-post": "^0.1.1"
   },
   "devDependencies": {
     "devtron": "^1.1.0",
-    "electron-packager": "^8.0.0",
     "electron": "^1.0.1",
+    "electron-packager": "^8.0.0",
+    "electron-window-manager": "^1.0.4",
     "xo": "^0.16.0"
   },
   "xo": {

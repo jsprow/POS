@@ -1,0 +1,103 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+  <meta charset="utf-8">
+  <title>Repleotech POS Log</title>
+  <meta name="viewport" content="width=device-width,minimum-scale=1,initial-scale=1">
+  <link rel="stylesheet" href="index.css">
+</head>
+
+<body>
+  <a id="close" class="close-btn">&#10006;</a>
+
+  <h1>Well look who it is...</h1>
+  <table>
+    <thead>
+      <tr>
+        <th>timestamp</th>
+        <th>first name</th>
+        <th>last name</th>
+        <th>birthdate</th>
+        <th>mobile</th>
+        <th>email</th>
+      </tr>
+    </thead>
+    <tbody id="logTable"></tbody>
+  </table>
+
+  <script src="ipc.js"></script>
+  <script>
+    var fs = require('fs');
+    var logClose = document.getElementById('close');
+    var logTable = document.getElementById('logTable');
+    var logArr = [];
+
+    function logModal() {
+  		ipcRenderer.messaging = {
+  			sendCloseLogWindow: function() {
+  				ipcRenderer.send('close-second-window', 'an-argument')
+  			},
+
+  			init: function() {
+  				logClose.addEventListener('click', function() {
+  					ipcRenderer.messaging.sendCloseLogWindow();
+  				});
+  			}
+  		};
+      ipcRenderer.messaging.init();
+    }
+
+    logModal();
+
+    function readLog() {
+      logTable.innerHTML = '';
+    	fs.readFile(path + '/log.txt', 'utf8', (err, data) => {
+    		if (err) throw err;
+    		let logJSON = data;
+    		let logSplit = logJSON.split('\n');
+
+    		for (var i in logSplit) {
+    			if (logSplit[i]) {
+    				let logEntry = JSON.parse(logSplit[i]),
+                timestamp = logEntry.timestamp,
+                first = logEntry.first,
+                last = logEntry.last,
+                birthdate = logEntry.birthdate,
+                mobile = logEntry.mobile,
+                email = logEntry.email,
+
+                row = document.createElement('tr'),
+                tdTimestamp = document.createElement('td'),
+
+                tdFirst = document.createElement('td'),
+                tdLast = document.createElement('td'),
+                tdBirthdate = document.createElement('td'),
+                tdMobile = document.createElement('td'),
+                tdEmail = document.createElement('td');
+
+            tdTimestamp.innerHTML = timestamp;
+            tdFirst.innerHTML = first;
+            tdLast.innerHTML = last;
+            tdBirthdate.innerHTML = birthdate;
+            tdMobile.innerHTML = mobile;
+            tdEmail.innerHTML = email;
+
+            row.appendChild(tdTimestamp);
+            row.appendChild(tdFirst);
+            row.appendChild(tdLast);
+            row.appendChild(tdBirthdate);
+            row.appendChild(tdMobile);
+            row.appendChild(tdEmail);
+
+            logTable.appendChild(row);
+    			}
+    		}
+    	});
+    }
+    readLog();
+    setInterval(readLog, 10000);
+  </script>
+</body>
+
+</html>

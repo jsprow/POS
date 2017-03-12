@@ -1,13 +1,13 @@
 {
-  "name": "rewards app",
+  "name": "rewards_app",
   "productName": "Rewards App",
   "version": "0.1.0",
   "description": "",
   "license": "MIT",
-  "repository": "user/repo",
+  "repository": "jsprow/POS",
   "author": {
-    "name": "",
-    "email": "",
+    "name": "Josh Sprow",
+    "email": "josh@repleotech.com",
     "url": ""
   },
   "scripts": {

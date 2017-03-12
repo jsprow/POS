@@ -9,19 +9,15 @@ ipcMain.on('open-second-window', (event, arg)=> {
   logWindow = createLogModal();
 });
 ipcMain.on('asynchronous-message', (event, arg)=> {
-	console.log('said', arg);
 	event.sender.send('synchronous-reply', 'refresh');
 });
-
 ipcMain.on('close-second-window', (event, arg)=> {
   logWindow.hide();
 });
 ipcMain.on('shrink-window', (event, arg)=> {
 	mainWindow.setSize(400, 160, true);
-	console.log('heard shrink');
 });
 ipcMain.on('grow-window', (event, arg)=> {
-	console.log('heard grow');
 	mainWindow.setSize(400, 500, true);
 });
 
@@ -67,7 +63,7 @@ function createLogModal() {
 	});
 
 	log.loadURL(`file://${__dirname}/log.html`);
-	
+
 	log.once('ready-to-show', () => {
 	  log.show();
 	});

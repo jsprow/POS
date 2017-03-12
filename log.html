@@ -35,7 +35,6 @@
 
     ipcRenderer.on('synchronous-reply', (event, arg)=> {
       readLog();
-      console.log('heard', arg);
     });
     ipcRenderer.send('asynchronous-message', 'ping');
 

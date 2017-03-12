@@ -223,7 +223,6 @@ pointsButton.addEventListener('click', function() {
 	let pointsQty = document.getElementById('pointsQty');
 	if (pointsQty.checkValidity()) {
 		var post_qty = pointsQty.value;
-		console.log(post_qty);
 		givePoints(post_qty);
 	} else {
 		pointsQty.setAttribute('invalid', '');

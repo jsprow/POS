@@ -32,7 +32,7 @@ div.hidden {
 }
 .hide-button {
 	position: absolute;
-	top: 10px;
+	top: 50px;
 	left: 10px;
 	width: 20px;
 	height: 20px;
@@ -157,28 +157,25 @@ button:active {
 button:last-of-type {
 	margin-right: auto;
 }
-table,
-thead,
-tbody,
-tr {
+table {
 	width: 660px;
+	margin: 20px auto;
+	border-collapse: collapse;
 }
 thead {
+	width: 100%;
 	font-size: 1.1em;
+}
+tbody {
+	width: 100%;
 }
 tbody tr:nth-of-type(2n-1) {
 	background-color: #eee;
 }
-table {
-	margin: 20px auto;
-	height: 300px;
-	overflow-y: scroll;
-}
-td,
-th {
-	max-width: max-content;
+th,
+td {
 	text-align: left;
-	padding: 10px;
+	padding: 10px 0 10px 10px;
 }
 .close-btn {
 	cursor: pointer;

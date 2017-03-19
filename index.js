@@ -3,7 +3,7 @@ const electron = require('electron');
 const app = electron.app;
 const {ipcMain} = require('electron');
 const path = require('path');
-const autoUpdater = require('auto-updater');
+const autoUpdater = require("electron-updater").autoUpdater
 const appVersion = require('./package.json').version;
 const os = require('os').platform();
 

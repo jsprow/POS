@@ -26,6 +26,7 @@
   ],
   "dependencies": {
     "electron-debug": "^1.0.0",
+    "electron-updater": "^1.10.4",
     "jquery": "^3.1.1"
   },
   "devDependencies": {
@@ -36,9 +37,9 @@
     "xo": "^0.16.0"
   },
   "build": {
-    "appId": "your.id",
+    "appId": "com.electron.rewards_app",
     "mac": {
-      "category": "your.app.category.type"
+      "category": "rewards_app.app.category.shopping"
     }
   },
   "xo": {

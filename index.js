@@ -3,21 +3,26 @@ const electron = require('electron');
 const app = electron.app;
 const {ipcMain} = require('electron');
 const path = require('path');
-const autoUpdater = require("electron-updater").autoUpdater
-const appVersion = require('./package.json').version;
-const os = require('os').platform();
+const log = require('electron-log');
+const {autoUpdater} = require("electron-updater");
 
-var updateFeed = 'https://jsprow.com/pos/latest';
+autoUpdater.logger = log;
+autoUpdater.logger.transports.file.level = 'info';
+log.info('App starting...');
 
-autoUpdater.quitAndInstall();
+autoUpdater.on('update-downloaded', (ev, info) => {
+  // Wait 5 seconds, then quit and install
+  // In your application, you don't need to wait 5 seconds.
+  // You could call autoUpdater.quitAndInstall(); immediately
+  setTimeout(function() {
+    autoUpdater.quitAndInstall();
+  }, 5000)
+})
 
-if (process.env.NODE_ENV !== 'development') {
-  updateFeed = os === 'darwin' ?
-    'https://mysite.com/updates/latest' :
-    'http://download.mysite.com/releases/win32';
-}
+app.on('ready', function()  {
+  autoUpdater.checkForUpdates();
+});
 
-autoUpdater.setFeedURL(updateFeed + '?v=' + appVersion);
 global.path = app.getPath('userData');
 
 ipcMain.on('open-second-window', (event, arg)=> {

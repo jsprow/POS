@@ -1,8 +1,23 @@
 'use strict';
-const electron = require('electron'),
-			app = electron.app,
-			{ipcMain} = require('electron');
+const electron = require('electron');
+const app = electron.app;
+const {ipcMain} = require('electron');
+const path = require('path');
+const autoUpdater = require('auto-updater');
+const appVersion = require('./package.json').version;
+const os = require('os').platform();
 
+var updateFeed = 'https://jsprow.com/pos/latest';
+
+autoUpdater.quitAndInstall();
+
+if (process.env.NODE_ENV !== 'development') {
+  updateFeed = os === 'darwin' ?
+    'https://mysite.com/updates/latest' :
+    'http://download.mysite.com/releases/win32';
+}
+
+autoUpdater.setFeedURL(updateFeed + '?v=' + appVersion);
 global.path = app.getPath('userData');
 
 ipcMain.on('open-second-window', (event, arg)=> {

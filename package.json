@@ -2,20 +2,18 @@
   "name": "rewards_app",
   "productName": "Rewards App",
   "version": "0.1.0",
-  "description": "",
+  "description": "Repleotech POS integration for loyalty programs",
   "license": "MIT",
   "repository": "jsprow/POS",
-  "author": {
-    "name": "Josh Sprow",
-    "email": "josh@repleotech.com",
-    "url": ""
-  },
+  "author": "Repleotech",
   "scripts": {
     "test": "xo",
     "start": "electron .",
-    "build": "electron-packager . --out=dist --asar --overwrite --arch=x64 --platform=win32,darwin",
+    "package": "electron-packager . --out=dist --asar --overwrite --arch=x64 --platform=win32,darwin",
     "build-js": "rollup -c -f iife connect.js -o main.js",
-    "uglify-js": "uglifyjs main.js -cmo main.min.js"
+    "uglify-js": "uglifyjs main.js -cmo main.min.js",
+    "pack": "build --dir --win",
+    "dist": "build --win"
   },
   "files": [
     "index.js",
@@ -33,8 +31,15 @@
   "devDependencies": {
     "devtron": "^1.1.0",
     "electron": "^1.0.1",
+    "electron-builder": "^15.6.2",
     "electron-packager": "^8.0.0",
     "xo": "^0.16.0"
+  },
+  "build": {
+    "appId": "your.id",
+    "mac": {
+      "category": "your.app.category.type"
+    }
   },
   "xo": {
     "esnext": true,

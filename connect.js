@@ -20,17 +20,11 @@ const remote = require('electron').remote,
 			logButton = document.getElementById('logModalButton'),
 			submitButton = document.getElementById('submitButton'),
 			pointButton = document.getElementById('pointsButton'),
-      hideButton = document.getElementById('hideButton'),
-			pauseBox = document.getElementById('pauseBox');
+      hideButton = document.getElementById('hideButton');
 
 var post_mobile = [],
 		isPaused = false,
-		inputs = document.getElementsByTagName('input'),
-		timer = window.setInterval(function() {
-			if (!isPaused) {
-				getStuff();
-			}
-		}, 10000);
+		inputs = document.getElementsByTagName('input');
 
 function ipcFunction() {
 	ipcRenderer.messaging = {
@@ -52,10 +46,16 @@ function ipcFunction() {
 			hideButton.addEventListener('click', function() {
         if (!shrunk) {
           $('.to-hide').addClass('hidden');
+					$('.minus').addClass('rotate');
+					$('.plus').addClass('rotate');
+					$('.to-show').addClass('showing');
   				ipcRenderer.messaging.sendShrink();
           shrunk = true;
         } else {
           $('.to-hide').removeClass('hidden');
+					$('.minus').removeClass('rotate');
+					$('.plus').removeClass('rotate');
+					$('.to-show').removeClass('showing');
           ipcRenderer.messaging.sendGrow();
           shrunk = false;
         }
@@ -114,31 +114,42 @@ function getStuff() {
 
 				post_mobile[0] = parsedData.mobile;
 
-				function inputGen(parsedKey, element, inputId, placeholder, type) {
+				function inputGen(parsedKey, element, inputId, type) {
 					if (parsedKey === undefined) {
 						var input = document.createElement('input'),
 						child = element.firstChild;
 						input.setAttributes({
 							'id': inputId,
-							'placeholder': placeholder,
-							'type': type
+							'type': type,
+							'placeholder': ' '
 						});
 						element.innerHTML = '';
 						element.appendChild(input);
 					} else {
-						element.innerHTML = parsedKey;
+						var span = document.createElement('span');
+						span.setAttribute('class','filled');
+						span.innerHTML = parsedKey;
+						element.innerHTML = '';
+						element.appendChild(span);
 					}
 				}
-				inputGen(parsedData.firstname, first, 'firstInput', 'First Name', '');
-				inputGen(parsedData.lastname, last, 'lastInput', 'Last Name', '');
-				inputGen(parsedData.birthdate, birthdate, 'birthdateInput', '', 'date');
-				inputGen(parsedPhone, mobile, 'mobileInput', '5555555555', 'tel');
-				inputGen(parsedData.email, email, 'emailInput', 'name@example.com', 'email');
+				inputGen(parsedData.firstname, first, 'firstInput', '');
+				inputGen(parsedData.lastname, last, 'lastInput', '');
+				inputGen(parsedData.birthdate, birthdate, 'birthdateInput', 'date');
+				var dateInput = document.querySelector('#birthdateInput');
+				dateInput.addEventListener('keyup', function(e) {
+					$('#birthdateInput').addClass('date-changed');
+					if (dateInput.validity.valid) {
+						$('#birthdateInput').addClass('valid');
+					}
+				});
+				inputGen(parsedPhone, mobile, 'mobileInput', 'tel');
+				inputGen(parsedData.email, email, 'emailInput', 'email');
 
 				for (var i = 0; i < inputs.length; i++) {
 					inputs[i].addEventListener('click', function() {
 						isPaused = true;
-						pauseBox.innerHTML = '...refresh is paused while you type';
+						$('#pauseBox').addClass('paused');
 					});
 				}
 			} catch (e) {
@@ -149,15 +160,23 @@ function getStuff() {
 		console.log("Got error: " + (e.message));
 	});
 }
+getStuff();
+
+window.setInterval(function() {
+	if (!isPaused) {
+		getStuff();
+	} else {
+		return;
+	}
+}, 5000);
+
 const refreshBtn = document.getElementById('refresh');
 
 refreshBtn.addEventListener('click', function () {
 	getStuff();
 	isPaused = false;
-	pauseBox.innerHTML = '';
+	$('#pauseBox').removeClass('paused');
 });
-
-getStuff();
 
 function pushStuff() {
 	if (document.getElementById('firstInput') != null) {
@@ -229,7 +248,7 @@ pointsButton.addEventListener('click', function() {
 	}
 });
 function givePoints(qty) {
-	http.get('http://www.repleotech.com/gateway/kiosk_submission.asp?user_guid=' + user + '&kiosk=' + keyword + '&mobile=2693529412' + /* todo replace my number with post_mobile[0] + */ '&submission_type=loyalty&quantity=' + qty, function(res) {
+	http.get('http://www.repleotech.com/gateway/kiosk_submission.asp?user_guid=' + user + '&kiosk=' + keyword + '&mobile=2693529412' + /* todo replace my number with post_mobile[0] + */ '&submission_type=datacapture&quantity=' + qty, function(res) {
 
 		/* todo use &submission_type=loyalty or =datacapture ? */
 
@@ -252,10 +271,11 @@ function givePoints(qty) {
 		});
 	});
 }
+/* todo ensure that form cannot be submitted with invalid input */
 
 submitButton.addEventListener('click', function () {
 	pushStuff();
 	getStuff();
 	isPaused = false;
-	pauseBox.innerHTML = '';
+	$('#pauseBox').removeClass('paused');
 });

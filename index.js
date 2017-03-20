@@ -1,5 +1,4 @@
 'use strict';
-if (require('electron-squirrel-startup')) return;
 const electron = require('electron');
 const {app, ipcMain, Menu, BrowserWindow} = require('electron');
 const path = require('path');
@@ -42,41 +41,6 @@ if (process.platform === 'darwin') {
     ]
   })
 }
-
-//create updater window
-function sendStatusToWindow(text) {
-  log.info(text);
-  versionWindow.webContents.send('message', text);
-}
-
-let versionWindow;
-function createVersionWindow() {
-  versionWindow = new BrowserWindow();
-  versionWindow.webContents.openDevTools();
-  versionWindow.on('closed', () => {
-    versionWindow = null;
-  });
-  versionWindow.loadURL(`file://${__dirname}/version.html#v${app.getVersion()}`);
-  return versionWindow;
-}
-autoUpdater.on('checking-for-update', () => {
-  sendStatusToWindow('Checking for update...');
-})
-autoUpdater.on('update-available', (ev, info) => {
-  sendStatusToWindow('Update available.');
-})
-autoUpdater.on('update-not-available', (ev, info) => {
-  sendStatusToWindow('Update not available.');
-})
-autoUpdater.on('error', (ev, err) => {
-  sendStatusToWindow('Error in auto-updater.');
-})
-autoUpdater.on('download-progress', (ev, progressObj) => {
-  sendStatusToWindow('Download progress...');
-})
-autoUpdater.on('update-downloaded', (ev, info) => {
-  sendStatusToWindow('Update downloaded; will install in 5 seconds');
-});
 
 //get path for writing userData/log.txt
 global.path = app.getPath('userData');
@@ -127,6 +91,7 @@ function createMainWindow() {
 
 	return win;
 }
+
 function createLogModal() {
 	const log = new electron.BrowserWindow({
 				parent: mainWindow,
@@ -159,9 +124,34 @@ app.on('activate', () => {
 
 app.on('ready', () => {
 	mainWindow = createMainWindow();
-	//mainWindow.webContents.openDevTools();
+
+	mainWindow.webContents.openDevTools();
+
+	//display menu
 	const menu = Menu.buildFromTemplate(template);
   Menu.setApplicationMenu(menu);
 
-  createVersionWindow();
+	//send auto-updater and version messaging to window
+	function sendStatusToWindow(text) {
+	  log.info(text);
+	  mainWindow.webContents.send('message', text);
+	}
+	autoUpdater.on('checking-for-update', () => {
+	  sendStatusToWindow('Checking for update...');
+	})
+	autoUpdater.on('update-available', (ev, info) => {
+	  sendStatusToWindow('Update available.');
+	})
+	autoUpdater.on('update-not-available', (ev, info) => {
+	  sendStatusToWindow('Update not available.');
+	})
+	autoUpdater.on('error', (ev, err) => {
+	  sendStatusToWindow('Error in auto-updater.');
+	})
+	autoUpdater.on('download-progress', (ev, progressObj) => {
+	  sendStatusToWindow('Download progress...');
+	})
+	autoUpdater.on('update-downloaded', (ev, info) => {
+	  sendStatusToWindow('Update downloaded; will install in 5 seconds');
+	});
 });

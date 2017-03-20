@@ -11,6 +11,10 @@
 <body class="main-body">
 	<div class="dragbar">
 		<img src="logo_r.svg" alt="repleotech logo">
+		<div class="update-box">
+			<span id="version">vX.Y.Z</span>
+		  <div id="messages">Update Message</div>
+		</div>
 	</div>
 	<div id="hideButton" class="hide-button">
 		<div class="minus"></div>
@@ -69,6 +73,18 @@
 	</div>
 	<p id="status" style="position: absolute; bottom: 0; left: 0; width: 100%"></p>
 	<script src="connect.js"></script>
+	<script>
+	let version = window.location.hash.substring(1);
+	document.getElementById('version').innerText = version;
+
+	ipcRenderer.on('message', function(event, text) {
+		var container = document.getElementById('messages');
+		var message = document.createElement('div');
+		message.innerHTML = text;
+		container.innerHTML = '';
+	  container.appendChild(message);
+	});
+	</script>
 </body>
 
 </html>

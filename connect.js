@@ -137,12 +137,14 @@ function getStuff() {
 				inputGen(parsedData.lastname, last, 'lastInput', '');
 				inputGen(parsedData.birthdate, birthdate, 'birthdateInput', 'date');
 				var dateInput = document.querySelector('#birthdateInput');
+				if (dateInput) {
 				dateInput.addEventListener('keyup', function(e) {
 					$('#birthdateInput').addClass('date-changed');
 					if (dateInput.validity.valid) {
 						$('#birthdateInput').addClass('valid');
 					}
 				});
+			}
 				inputGen(parsedPhone, mobile, 'mobileInput', 'tel');
 				inputGen(parsedData.email, email, 'emailInput', 'email');
 

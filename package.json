@@ -9,11 +9,8 @@
   "scripts": {
     "test": "xo",
     "start": "electron .",
-    "package": "electron-packager . --out=dist --asar --overwrite --arch=x64 --platform=win32,darwin",
-    "build-js": "rollup -c -f iife connect.js -o main.js",
-    "uglify-js": "uglifyjs main.js -cmo main.min.js",
-    "pack": "build --dir --win",
-    "dist": "build --win"
+    "pack": "electron-packager . --out=dist --asar --overwrite --arch=x64 --platform=win32,darwin",
+    "dist": "build --win --mac"
   },
   "files": [
     "index.js",

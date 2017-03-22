@@ -13,12 +13,12 @@ autoUpdater.logger.transports.file.level = 'info';
 log.info('App starting...');
 
 autoUpdater.on('update-downloaded', (ev, info) => {
-  setTimeout(function() {
+  setTimeout( () => {
     autoUpdater.quitAndInstall();
   }, 5000);
 })
 
-app.on('ready', function()  {
+app.on('ready', () =>  {
   autoUpdater.checkForUpdates();
 });
 
@@ -46,20 +46,20 @@ if (process.platform === 'darwin') {
 global.path = app.getPath('userData');
 
 //logic for opening, refreshing and closing log
-ipcMain.on('open-second-window', (event, arg)=> {
+ipcMain.on('open-second-window', (event, arg) => {
   logWindow = createLogModal();
 });
-ipcMain.on('asynchronous-message', (event, arg)=> {
+ipcMain.on('asynchronous-message', (event, arg) => {
 	event.sender.send('synchronous-reply', 'refresh');
 });
-ipcMain.on('close-second-window', (event, arg)=> {
+ipcMain.on('close-second-window', (event, arg) => {
   logWindow.hide();
 });
-ipcMain.on('shrink-window', (event, arg)=> {
+ipcMain.on('shrink-window', (event, arg) => {
 	mainWindow.setSize(400, 160, true);
 });
-ipcMain.on('grow-window', (event, arg)=> {
-	mainWindow.setSize(400, 500, true);
+ipcMain.on('grow-window', (event, arg) => {
+	mainWindow.setSize(400, 520, true);
 });
 
 let mainWindow;
@@ -72,9 +72,9 @@ function onClosed() {
 
 function createMainWindow() {
 	const win = new electron.BrowserWindow({
-				backgroundColor: '#ffffff',
+				backgroundColor: '#fff',
 				width: 400,
-				height: 500,
+				height: 520,
 				frame: false,
 				x: 0,
 				y: 0,
@@ -96,7 +96,7 @@ function createLogModal() {
 	const log = new electron.BrowserWindow({
 				parent: mainWindow,
 				width: 900,
-				height: 500,
+				height: 520,
 				modal: true,
 				show: false,
 				frame: false
@@ -125,7 +125,7 @@ app.on('activate', () => {
 app.on('ready', () => {
 	mainWindow = createMainWindow();
 
-	mainWindow.webContents.openDevTools();
+	//mainWindow.webContents.openDevTools();
 
 	//display menu
 	const menu = Menu.buildFromTemplate(template);
@@ -136,6 +136,7 @@ app.on('ready', () => {
 	  log.info(text);
 	  mainWindow.webContents.send('message', text);
 	}
+  sendStatusToWindow();
 	autoUpdater.on('checking-for-update', () => {
 	  sendStatusToWindow('Checking for update...');
 	})

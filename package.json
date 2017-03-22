@@ -1,7 +1,7 @@
 {
   "name": "rewards_app",
   "productName": "Rewards App",
-  "version": "0.1.6",
+  "version": "0.1.8",
   "description": "Repleotech POS integration for loyalty programs",
   "license": "MIT",
   "repository": "jsprow/POS",
@@ -10,7 +10,7 @@
     "test": "xo",
     "start": "electron .",
     "pack": "electron-packager . --out=dist --asar --overwrite --arch=x64 --platform=win32,darwin",
-    "dist": "build --win"
+    "dist": "build --win --ia32"
   },
   "files": [
     "index.js",

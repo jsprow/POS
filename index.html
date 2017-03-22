@@ -11,49 +11,61 @@
 <body class="main-body">
 	<div class="dragbar">
 		<img src="logo_r.svg" alt="repleotech logo">
-		<div class="update-box">
-			<span id="version">vX.Y.Z</span>
-		  <div id="messages">Update Message</div>
+		<div id="hideButton" class="hide-button">
+			<div class="minus"></div>
+			<div class="plus"></div>
 		</div>
 	</div>
-	<div id="hideButton" class="hide-button">
-		<div class="minus"></div>
-		<div class="plus"></div>
+	<div class="update-box">
+		<span id="version">vX.Y.Z</span>
+		<div id="messages">Update Message</div>
 	</div>
 	<div class="to-hide">
 		<div class="box">
 			<p>First Name:</p>
 			<span id="first">
-				<span></span>
+				<label for="first-input"></label>
+				<input name="first-input" id="firstInput">
+				<span id="firstSpan" class="info-span"></span>
 			</span>
 		</div>
 		<div class="box">
 			<p>Last Name:</p>
 			<span id="last">
-        <span></span>
+				<label for="last-input"></label>
+				<input name="last-input" id="lastInput">
+        <span id="lastSpan" class="info-span"></span>
 			</span>
 		</div>
 		<div class="box">
 			<p>Birthdate:</p>
 			<span id="birthdate">
-        <span></span>
+				<label for="birthdate-input"></label>
+				<input id="birthdateInput" name="birthdate-input" type="date">
+        <span id="birthdateSpan" class="info-span"></span>
 			</span>
 		</div>
 	</div>
 	<div class="box">
 		<p class="to-hide">Phone:</p>
 		<span id="mobile" class="to-show">
-      <span></span>
+      <span id="mobileSpan"></span>
 		</span>
 	</div>
 	<div class="to-hide">
 		<div class="box">
 			<p>Email:</p>
 			<span id="email">
-        <span></span>
+				<label for="email-input"></label>
+				<input name="email-input" id="emailInput">
+        <span id="emailSpan" class="info-span"></span>
 			</span>
 		</div>
 		<div class="box">
+			<button id="refresh" class="refresh-button">
+				<p class="refresh-text">Refresh Page</p>
+				<p id="pauseBox" class="pause-box">Paused</p>
+			</button>
 			<button id="submitButton">Update Info</button>
 		</div>
 		<div class="box loyalty-box">
@@ -64,10 +76,6 @@
 			<button id="pointsButton">Add Points</button>
 		</div>
 		<div class="box bottom-box">
-			<button id="refresh" class="refresh-button">
-				<p class="refresh-text">Refresh Page</p>
-				<p id="pauseBox" class="pause-box">Paused</p>
-			</button>
 			<button id="logModalButton">Open Log</button>
 		</div>
 	</div>
@@ -77,12 +85,14 @@
 	let version = window.location.hash.substring(1);
 	document.getElementById('version').innerText = version;
 
-	ipcRenderer.on('message', function(event, text) {
-		var container = document.getElementById('messages');
-		var message = document.createElement('div');
-		message.innerHTML = text;
-		container.innerHTML = '';
-	  container.appendChild(message);
+	ipcRenderer.on('message', (event, text) => {
+		window.setTimeout( () => {
+			var container = document.getElementById('messages');
+			var message = document.createElement('div');
+			message.innerHTML = text;
+			container.innerHTML = '';
+			container.appendChild(message);
+		}, 5000);
 	});
 	</script>
 </body>

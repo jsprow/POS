@@ -1,9 +1,16 @@
 'use strict';
 const electron = require('electron');
-const {app, ipcMain, Menu, BrowserWindow} = require('electron');
+const {
+	app,
+	ipcMain,
+	Menu,
+	BrowserWindow
+} = require('electron');
 const path = require('path');
 const log = require('electron-log');
-const {autoUpdater} = require("electron-updater");
+const {
+	autoUpdater
+} = require("electron-updater");
 
 require('electron-debug')();
 
@@ -13,33 +20,34 @@ autoUpdater.logger.transports.file.level = 'info';
 log.info('App starting...');
 
 autoUpdater.on('update-downloaded', (ev, info) => {
-  setTimeout( () => {
-    autoUpdater.quitAndInstall();
-  }, 5000);
+	setTimeout(() => {
+		autoUpdater.quitAndInstall();
+	}, 5000);
 })
 
-app.on('ready', () =>  {
-  autoUpdater.checkForUpdates();
+app.on('ready', () => {
+	autoUpdater.checkForUpdates();
 });
 
 //Define the menu for osx
 let template = []
 if (process.platform === 'darwin') {
-  const name = app.getName();
-  template.unshift({
-    label: name,
-    submenu: [
-      {
-        label: 'About ' + name,
-        role: 'about'
-      },
-      {
-        label: 'Quit',
-        accelerator: 'Command+Q',
-        click() { app.quit(); }
-      },
-    ]
-  })
+	const name = app.getName();
+	template.unshift({
+		label: name,
+		submenu: [{
+				label: 'About ' + name,
+				role: 'about'
+			},
+			{
+				label: 'Quit',
+				accelerator: 'Command+Q',
+				click() {
+					app.quit();
+				}
+			},
+		]
+	})
 }
 
 //get path for writing userData/log.txt
@@ -47,13 +55,13 @@ global.path = app.getPath('userData');
 
 //logic for opening, refreshing and closing log
 ipcMain.on('open-second-window', (event, arg) => {
-  logWindow = createLogModal();
+	logWindow = createLogModal();
 });
 ipcMain.on('asynchronous-message', (event, arg) => {
 	event.sender.send('synchronous-reply', 'refresh');
 });
 ipcMain.on('close-second-window', (event, arg) => {
-  logWindow.hide();
+	logWindow.hide();
 });
 ipcMain.on('shrink-window', (event, arg) => {
 	mainWindow.setSize(400, 160, true);
@@ -72,18 +80,18 @@ function onClosed() {
 
 function createMainWindow() {
 	const win = new electron.BrowserWindow({
-				backgroundColor: '#fff',
-				width: 400,
-				height: 520,
-				frame: false,
-				x: 0,
-				y: 0,
-				title: 'Rewards App',
-				show: false
+		backgroundColor: '#fff',
+		width: 400,
+		height: 520,
+		frame: false,
+		x: 0,
+		y: 0,
+		title: 'Rewards App',
+		show: false
 	});
 	win.setAlwaysOnTop(true);
 	win.once('ready-to-show', () => {
-	  win.show();
+		win.show();
 	});
 
 	win.loadURL(`file://${__dirname}/index.html`);
@@ -94,18 +102,18 @@ function createMainWindow() {
 
 function createLogModal() {
 	const log = new electron.BrowserWindow({
-				parent: mainWindow,
-				width: 900,
-				height: 520,
-				modal: true,
-				show: false,
-				frame: false
+		parent: mainWindow,
+		width: 900,
+		height: 520,
+		modal: true,
+		show: false,
+		frame: false
 	});
 
 	log.loadURL(`file://${__dirname}/log.html`);
 
 	log.once('ready-to-show', () => {
-	  log.show();
+		log.show();
 	});
 	return log;
 }
@@ -129,30 +137,31 @@ app.on('ready', () => {
 
 	//display menu
 	const menu = Menu.buildFromTemplate(template);
-  Menu.setApplicationMenu(menu);
+	Menu.setApplicationMenu(menu);
 
 	//send auto-updater and version messaging to window
 	function sendStatusToWindow(text) {
-	  log.info(text);
-	  mainWindow.webContents.send('message', text);
+		log.info(text);
+		mainWindow.webContents.send('message', text);
 	}
-  sendStatusToWindow();
 	autoUpdater.on('checking-for-update', () => {
-	  sendStatusToWindow('Checking for update...');
+		sendStatusToWindow('Checking for update...');
+		mainWindow.webContents.send('show-update-bar');
 	})
 	autoUpdater.on('update-available', (ev, info) => {
-	  sendStatusToWindow('Update available.');
+		sendStatusToWindow('Update available.');
+    mainWindow.webContents.send('show-update-bar');
 	})
 	autoUpdater.on('update-not-available', (ev, info) => {
-	  sendStatusToWindow('Update not available.');
+		sendStatusToWindow('Update not available.');
 	})
 	autoUpdater.on('error', (ev, err) => {
-	  sendStatusToWindow('Error in auto-updater.');
+		sendStatusToWindow('Error in auto-updater.');
 	})
 	autoUpdater.on('download-progress', (ev, progressObj) => {
-	  sendStatusToWindow('Download progress...');
+		sendStatusToWindow('Downloading... Just a sec.');
 	})
 	autoUpdater.on('update-downloaded', (ev, info) => {
-	  sendStatusToWindow('Update downloaded; will install in 5 seconds');
+		sendStatusToWindow('Update downloaded... will install shortly');
 	});
 });

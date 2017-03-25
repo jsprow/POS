@@ -11,14 +11,16 @@
 <body class="main-body">
 	<div class="dragbar">
 		<img src="logo_r.svg" alt="repleotech logo">
+	</div>
+	<div class="dragbar-min">
 		<div id="hideButton" class="hide-button">
 			<div class="minus"></div>
 			<div class="plus"></div>
 		</div>
 	</div>
-	<div class="update-box">
+	<div id="updateBox" class="update-box">
 		<span id="version">vX.Y.Z</span>
-		<div id="messages">Update Message</div>
+		<div id="messages"></div>
 	</div>
 	<div class="to-hide">
 		<div class="box">
@@ -69,11 +71,13 @@
 			<button id="submitButton">Update Info</button>
 		</div>
 		<div class="box loyalty-box">
+			<!--
 			<p>Loyalty Points:</p>
 			<span>
 				<input id="pointsQty" class="points-qty" placeholder=" " type="number" min="0" max="10">
 			</span>
-			<button id="pointsButton">Add Points</button>
+			-->
+			<button id="pointsButton">Add 50&cent;</button>
 		</div>
 		<div class="box bottom-box">
 			<button id="logModalButton">Open Log</button>
@@ -82,18 +86,23 @@
 	<p id="status" style="position: absolute; bottom: 0; left: 0; width: 100%"></p>
 	<script src="connect.js"></script>
 	<script>
-	let version = window.location.hash.substring(1);
-	document.getElementById('version').innerText = version;
+		let version = window.location.hash.substring(1),
+			updateBox = document.getElementById('updateBox'),
+			container = document.getElementById('messages'),
+			message = document.createElement('div'); {
+		}
 
-	ipcRenderer.on('message', (event, text) => {
-		window.setTimeout( () => {
-			var container = document.getElementById('messages');
-			var message = document.createElement('div');
+		document.getElementById('version').innerText = version;
+
+		ipcRenderer.on('show-update-bar', (event) => {
+			updateBox.classList.add('show');
+		});
+
+		ipcRenderer.on('message', (event, text) => {
 			message.innerHTML = text;
 			container.innerHTML = '';
 			container.appendChild(message);
-		}, 5000);
-	});
+		});
 	</script>
 </body>
 

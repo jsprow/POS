@@ -1,6 +1,8 @@
 const remote = require('electron').remote,
 	path = remote.getGlobal('path'),
-	{ ipcRenderer	} = require('electron'),
+	{
+		ipcRenderer
+	} = require('electron'),
 	http = require('http'),
 	https = require('https'),
 	fs = require('fs'),
@@ -139,21 +141,21 @@ function getStuff() {
 								let input = document.getElementById(inputId);
 								let span = document.getElementById(spanId);
 								span.classList.add('hidden');
-								window.setTimeout( () => {
+								window.setTimeout(() => {
 									input.classList.remove('hidden');
 								}, 300);
 								input.focus();
 								submitButton.addEventListener('click', () => {
 									input.classList.add('hidden');
 									input.value = '';
-									window.setTimeout( () => {
+									window.setTimeout(() => {
 										span.classList.remove('hidden');
 									}, 300);
 								});
 								refreshButton.addEventListener('click', () => {
 									input.classList.add('hidden');
 									input.value = '';
-									window.setTimeout( () => {
+									window.setTimeout(() => {
 										span.classList.remove('hidden');
 									}, 300);
 								});
@@ -280,8 +282,9 @@ pointsButton.addEventListener('click', () => {
 });
 
 function givePoints(qty) {
-	http.get('http://www.repleotech.com/gateway/kiosk_submission.asp?user_guid=' + user + '&kiosk=' + keyword + '&mobile=2693529412' + /* todo replace my number with post_mobile[0] + */ '&submission_type=datacapture&quantity=' + qty, function(res) {
+	http.get('http://www.repleotech.com/gateway/contactmanager_keyword.asp?user_guid=' + user + '&keyword=' + keyword + '&mobile=2693529412', function(res) {
 
+		//		'http://www.repleotech.com/gateway/kiosk_submission.asp?user_guid=' + user + '&kiosk=' + keyword + '&mobile=2693529412' + /* todo replace my number with post_mobile[0] + */ '&submission_type=loyalty &quantity=' + qty
 		/* todo use &submission_type=loyalty or =datacapture ? */
 
 		var statusCode = res.statusCode,

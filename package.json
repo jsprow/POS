@@ -1,7 +1,7 @@
 {
   "name": "rewards_app",
   "productName": "Rewards App",
-  "version": "0.2.5",
+  "version": "0.2.6",
   "description": "Repleotech POS integration for loyalty programs",
   "license": "MIT",
   "repository": "jsprow/POS",
@@ -31,7 +31,7 @@
   "devDependencies": {
     "devtron": "^1.1.0",
     "electron": "^1.0.1",
-    "electron-builder": "^16.3.0",
+    "electron-builder": "^16.4.2",
     "electron-packager": "^8.0.0",
     "xo": "^0.16.0"
   },

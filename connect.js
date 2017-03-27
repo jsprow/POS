@@ -23,7 +23,8 @@ const remote = require('electron').remote,
 	submitButton = document.getElementById('submitButton'),
 	pointButton = document.getElementById('pointsButton'),
 	hideButton = document.getElementById('hideButton'),
-	refreshButton = document.getElementById('refresh');
+	refreshButton = document.getElementById('refresh'),
+	pauseButton = document.getElementById('pause');
 
 var post_mobile = [],
 	isPaused = false,
@@ -72,7 +73,7 @@ function ipcFunction() {
 }
 
 ipcFunction();
-
+//set multiple attributes at once
 Element.prototype.setAttributes = function(attrs) {
 	for (var idx in attrs) {
 		if ((idx === 'styles' || idx === 'style') && typeof attrs[idx] === 'object') {
@@ -86,7 +87,20 @@ Element.prototype.setAttributes = function(attrs) {
 		}
 	}
 };
-
+//convert strings to proper case
+String.prototype.toProperCase = function () {
+    return this.replace(/\w\S*/g, function(txt){return txt.charAt(0).toUpperCase() + txt.substr(1).toLowerCase();});
+};
+function pause() {
+	isPaused = true;
+	pauseButton.classList.add('paused');
+	refreshButton.classList.add('paused');
+}
+function unPause() {
+	isPaused = false;
+	pauseButton.classList.remove('paused');
+	refreshButton.classList.remove('paused');
+}
 function getStuff() {
 	http.get('http://www.repleotech.com/gateway/kiosk_last_checkin.asp?kiosk=' + kiosk + '&user_guid=' + user, (res) => {
 
@@ -119,7 +133,7 @@ function getStuff() {
 
 				post_mobile[0] = parsedData.mobile;
 
-				function spanGen(parsedKey, element, inputId, type, spanId) {
+				function spanGen(parsedKey, element, inputId, type, spanId, labelId) {
 					if (parsedKey != undefined && inputId) {
 						let input = document.getElementById(inputId);
 						input.classList.add('hidden');
@@ -127,7 +141,7 @@ function getStuff() {
 					let span = document.getElementById(spanId);
 					if (parsedKey != undefined) {
 						span.classList.add('filled');
-						span.innerHTML = parsedKey;
+						span.innerHTML = parsedKey.toProperCase();
 						if (spanId != 'mobileSpan') {
 							let img = document.createElement('img');
 							img.setAttributes({
@@ -136,17 +150,19 @@ function getStuff() {
 							img.classList.add('edit-img');
 							span.appendChild(img);
 							img.addEventListener('click', () => {
-								isPaused = true;
-								$('#pauseBox').addClass('paused');
+								pause();
 								let input = document.getElementById(inputId);
 								let span = document.getElementById(spanId);
+								let label = document.getElementById(labelId);
 								span.classList.add('hidden');
+								label.classList.add('hidden');
 								window.setTimeout(() => {
 									input.classList.remove('hidden');
 								}, 300);
 								input.focus();
 								submitButton.addEventListener('click', () => {
 									input.classList.add('hidden');
+									label.classList.add('hidden');
 									input.value = '';
 									window.setTimeout(() => {
 										span.classList.remove('hidden');
@@ -154,6 +170,7 @@ function getStuff() {
 								});
 								refreshButton.addEventListener('click', () => {
 									input.classList.add('hidden');
+									label.classList.add('hidden');
 									input.value = '';
 									window.setTimeout(() => {
 										span.classList.remove('hidden');
@@ -162,10 +179,14 @@ function getStuff() {
 							});
 						}
 					}
+					if (span.classList.contains('filled')) {
+						let label = document.getElementById(labelId);
+						label.classList.add('hidden');
+					}
 				}
-				spanGen(parsedData.firstname, first, 'firstInput', '', 'firstSpan');
-				spanGen(parsedData.lastname, last, 'lastInput', '', 'lastSpan');
-				spanGen(parsedData.birthdate, birthdate, 'birthdateInput', 'date', 'birthdateSpan');
+				spanGen(parsedData.firstname, first, 'firstInput', '', 'firstSpan', 'firstLabel');
+				spanGen(parsedData.lastname, last, 'lastInput', '', 'lastSpan', 'lastLabel');
+				spanGen(parsedData.birthdate, birthdate, 'birthdateInput', 'date', 'birthdateSpan', 'birthdateLabel');
 				var dateInput = document.querySelector('#birthdateInput');
 				if (dateInput) {
 					dateInput.addEventListener('keyup', (e) => {
@@ -175,12 +196,11 @@ function getStuff() {
 						}
 					});
 				}
-				spanGen(parsedPhone, mobile, '', 'tel', 'mobileSpan');
-				spanGen(parsedData.email, email, 'emailInput', 'email', 'emailSpan');
+				spanGen(parsedPhone, mobile, '', 'tel', 'mobileSpan', 'mobileLabel');
+				spanGen(parsedData.email, email, 'emailInput', 'email', 'emailSpan', 'emailLabel');
 				for (var i = 0; i < inputs.length; i++) {
 					inputs[i].addEventListener('click', () => {
-						isPaused = true;
-						$('#pauseBox').addClass('paused');
+						pause();
 					});
 				}
 			} catch (e) {
@@ -201,10 +221,9 @@ window.setInterval(() => {
 	}
 }, 5000);
 
-refreshButton.addEventListener('click', () => {
+pauseButton.addEventListener('click', () => {
+	unPause();
 	getStuff();
-	isPaused = false;
-	$('#pauseBox').removeClass('paused');
 });
 
 function pushStuff() {
@@ -274,8 +293,7 @@ pointsButton.addEventListener('click', () => {
 		givePoints(post_qty);
 		getStuff();
 		pointsQty.value = '';
-		isPaused = false;
-		$('#pauseBox').removeClass('paused');
+		unPause();
 	} else {
 		pointsQty.setAttribute('invalid', '');
 	}
@@ -311,6 +329,5 @@ function givePoints(qty) {
 submitButton.addEventListener('click', () => {
 	pushStuff();
 	getStuff();
-	isPaused = false;
-	$('#pauseBox').removeClass('paused');
+	unPause();
 });

@@ -64,10 +64,10 @@ ipcMain.on('close-second-window', (event, arg) => {
 	logWindow.hide();
 });
 ipcMain.on('shrink-window', (event, arg) => {
-	mainWindow.setSize(400, 160, true);
+	mainWindow.setSize(230, 160, true);
 });
 ipcMain.on('grow-window', (event, arg) => {
-	mainWindow.setSize(400, 520, true);
+	mainWindow.setSize(230, 380, true);
 });
 
 let mainWindow;
@@ -81,8 +81,8 @@ function onClosed() {
 function createMainWindow() {
 	const win = new electron.BrowserWindow({
 		backgroundColor: '#fff',
-		width: 400,
-		height: 520,
+		width: 230,
+		height: 380,
 		frame: false,
 		x: 0,
 		y: 0,

@@ -1,0 +1,221 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+	<meta charset="utf-8">
+	<title>Boxes!</title>
+	<style>
+		body {
+			background-color: purple;
+			overflow: hidden:
+		}
+		.box {
+			display: flex;
+			flex-flow: column nowrap;
+			justify-content: center;
+			align-items: center;
+			width: 50px;
+			height: 50px;
+			margin: 0;
+			padding: 0;
+
+			background-color: purple;
+		}
+
+		#cheesecake,
+		#cheesecake::before,
+		#cheesecake::after {
+			position: absolute;
+
+			display: block;
+
+			content: '';
+
+			box-shadow: 0 0 20px #444;
+		}
+
+		#cheesecake {
+			width: 250px;
+			height: 100px;
+
+			animation: spinner 8s infinite;
+
+			background: linear-gradient(#fff, #ccc);
+		}
+
+		#cheesecake::before {
+			top: 100px;
+			right: 0;
+
+			width: 200px;
+			height: 50px;
+
+			transform-origin: center;
+			animation: spinnerA 3s linear infinite;
+
+			background: linear-gradient(#999, #777);
+		}
+
+		#cheesecake::after {
+			top: -50px;
+			left: 0;
+
+			width: 200px;
+			height: 50px;
+
+			transform-origin: center;
+			animation: spinnerB 5s linear infinite;
+
+			background: linear-gradient(#555, #333);
+		}
+
+		@keyframes spinner {
+			0% {
+				transform: rotate(0);
+			}
+			15% {
+				width: 225px;
+				height: 125px;
+
+				transform: rotate(-90deg);
+			}
+			50% {
+				transform: rotate(60deg);
+			}
+			70% {
+				width: 210px;
+				height: 75px;
+
+				transform: rotate(-40deg);
+			}
+			100% {
+				transform: rotate(360deg);
+			}
+		}
+
+		@keyframes spinnerA {
+			0% {
+				transform: translate(0, 0) rotate(-270deg);
+			}
+			25% {
+				width: 225px;
+				height: 60px;
+
+				transform: translate(10px, -25px) rotate(-180deg);
+			}
+			50% {
+				width: 175px;
+				height: 40px;
+
+				transform: translate(50px, -50px) rotate(-360deg);
+			}
+			75% {
+				transform: translate(40px, 25px) rotate(-180deg);
+			}
+			100% {
+				width: 200px;
+				height: 50px;
+
+				transform: translate(0, 0) rotate(-270deg);
+			}
+		}
+
+		@keyframes spinnerB {
+			0% {
+				transform: translate(0, 0) rotate(-270deg);
+			}
+			25% {
+				transform: translate(30px, 25px) rotate(90deg);
+			}
+			50% {
+				transform: translate(0, -25px) rotate(180deg);
+			}
+			75% {
+				width: 250px;
+				height: 60px;
+
+				transform: translate(5px, -50px) rotate(0deg);
+			}
+			100% {
+				width: 200px;
+				height: 50px;
+
+				transform: translate(0, 0) rotate(-270deg);
+			}
+		}
+	</style>
+</head>
+
+<body>
+	<div class="box">
+		<div id="cheesecake"></div>
+	</div>
+
+	<script src="https://ajax.googleapis.com/ajax/libs/jquery/3.2.1/jquery.min.js"></script>
+	<script>
+		var mouse = {
+			'x': 0,
+			'y': 0
+		};
+
+		homex = 0;
+		homey = 0;
+		forcex = 0;
+		forcey = 0;
+		magnet = 500;
+
+		width = window.innerWidth;
+		height = window.innerHeight;
+
+		console.log(width, height);
+		$(document).bind('mousemove', function(e) {
+			mouse = {
+				'x': e.pageX,
+				'y': e.pageY
+			};
+		});
+
+
+		$('.box').each(function(index, el) {
+			$(el).data("homex", width / 2);
+			$(el).data("homey", height / 2);
+			// $(el).data("homex", parseInt($(el).position().left));
+			// $(el).data("homey", parseInt($(el).position().top));
+		});
+
+		$('.box').css('position', 'absolute');
+		setInterval(function() {
+			$('.box').each(function(index, el) {
+				el = $(el);
+				position = el.position();
+				x0 = el.offset().left;
+				y0 = el.offset().top;
+				x1 = mouse.x;
+				y1 = mouse.y;
+				distancex = x1 - x0;
+				distancey = y1 - y0;
+
+				distance = Math.sqrt((distancex * distancex) + (distancey * distancey));
+
+				/*
+				magnet = 2600 - distance*20;
+				if(distance>130) {
+					 magnet=0;
+				}
+				*/
+
+				powerx = x0 - (distancex / distance) * magnet / distance;
+				powery = y0 - (distancey / distance) * magnet / distance;
+
+				forcex = (forcex + (el.data('homex') - x0) / 2) / 50;
+				forcey = (forcey + (el.data('homey') - y0) / 2) / 50;
+
+
+				el.css('left', powerx + forcex);
+				el.css('top', powery + forcey);
+			});
+		}, 15);
+	</script>
+</body>
+
+</html>

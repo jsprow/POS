@@ -26,21 +26,21 @@
 		<div class="box">
 			<!-- <p>First Name:</p> -->
 			<span id="first">
-				<input name="first-input" id="firstInput">
+				<input name="first-input" id="firstInput" value="">
 				<label id="firstLabel" for="first-input">First Name</label>
 				<span id="firstSpan" class="info-span"></span>
 			</span>
 		</div>
 		<div class="box">
 			<span id="last">
-				<input name="last-input" id="lastInput">
+				<input name="last-input" id="lastInput" value="">
 				<label id="lastLabel" for="last-input">Last Name</label>
         <span id="lastSpan" class="info-span"></span>
 			</span>
 		</div>
 		<div class="box">
 			<span id="birthdate">
-				<input id="birthdateInput" name="birthdate-input" type="date">
+				<input id="birthdateInput" name="birthdate-input" type="date" value="">
 				<label id="birthdateLabel" for="birthdate-input"> Birthdate</label>
         <span id="birthdateSpan" class="info-span"></span>
 			</span>
@@ -52,28 +52,19 @@
       <span id="mobileSpan"></span>
 		</span>
 	</div>
+	<div class="box">
+		<span id="points" class="to-show">
+			<label id="pointsLabel" for="points-input"></label>
+      <span id="pointsSpan"></span>
+		</span>
+	</div>
 	<div class="to-hide">
 		<div class="box">
 			<span id="email">
-				<input name="email-input" id="emailInput">
+				<input name="email-input" id="emailInput" value="">
 				<label id="emailLabel" for="email-input">Email</label>
         <span id="emailSpan" class="info-span"></span>
 			</span>
-		</div>
-		<!-- <div class="box button-box">
-			<button id="refresh" class="refresh-button button">
-				<p class="refresh-text">Refresh Page</p>
-				<p id="pauseBox" class="pause-box">Paused</p>
-			</button>
-			<button id="submitButton" class="button">Update Info</button>
-		</div> -->
-		<div class="box">
-			<!--
-			<p>Loyalty Points:</p>
-			<span>
-				<input id="pointsQty" class="points-qty" placeholder=" " type="number" min="0" max="10">
-			</span>
-			-->
 		</div>
 		<div class="bottom-bar">
 			<button class="refresh-button bottom-button">
@@ -84,11 +75,11 @@
 				   <use xlink:href="pause.svg#pause"></use>
 			  </svg>
 			</button>
-			<button id="submitButton" class="bottom-button">
+			<button id="submitButton" class="bottom-button" type="submit">
 				<img src="paper-plane.svg" class="bottom-button__image" alt="">
 			</button>
 			<button id="pointsButton" class="bottom-button">
-				<p class="bottom-button__text">+1</p>
+				<p class="bottom-button__text">$</p>
 			</button>
 			<button class="bottom-button">
 				<img id="logModalButton" class="bottom-button__image" src="sticky-note-o.svg" alt="sticky">

@@ -10,6 +10,9 @@ const remote = require('electron').remote,
 
 	user = "{132643DA-4EFF-439C-847E-4AD7554D3D7A}",
 	kiosk = "{9ABD7B37-35FE-4174-B2D5-85A2A9B92693}",
+
+	//prtest {C043CE73-BF50-48BE-A533-ECB49540A69E}
+	//prkentwood {9ABD7B37-35FE-4174-B2D5-85A2A9B92693}
 	campaign = 'prkentwood',
 	keyword = 'prkentwood',
 
@@ -18,6 +21,7 @@ const remote = require('electron').remote,
 	birthdate = document.getElementById('birthdate'),
 	mobile = document.getElementById('mobile'),
 	email = document.getElementById('email'),
+	points = document.getElementById('points'),
 
 	logButton = document.getElementById('logModalButton'),
 	submitButton = document.getElementById('submitButton'),
@@ -132,7 +136,36 @@ function getStuff() {
 					parsedPhone = "(" + phoneArea + ") " + phoneThree + "-" + phoneFour;
 
 				post_mobile[0] = parsedData.mobile;
-
+				var currentLoyalty = parsedData.current_loyalty;
+				var usedLoyalty = parsedData.address;
+				var parsedPoints = '$' + ((currentLoyalty - usedLoyalty) * 0.5).toFixed(2);
+				pointsButton.addEventListener('click', () => {
+						cashOut();
+						console.log('click', currentLoyalty);
+						getStuff();
+						unPause();
+				});
+				function cashOut() {
+					http.get('http://www.repleotech.com/gateway/contactmanager.asp?user_guid={132643DA-4EFF-439C-847E-4AD7554D3D7A}&mobile=' + post_mobile[0] + '&address='+ currentLoyalty, (res) => {
+						var statusCode = res.statusCode,
+							contentType = res.headers['content-type'];
+						var error;
+						if (statusCode !== 200) {
+							error = new Error("Request Failed.\n" +
+								"Status Code: " + statusCode);
+						}
+						if (error) {
+							console.log(error.message);
+							res.resume();
+							return
+						}
+						res.setEncoding('utf8');
+						var rawData = '';
+						res.on('data', function(chunk) {
+							console.log(rawData += chunk);
+						});
+					});
+				}
 				function spanGen(parsedKey, element, inputId, type, spanId, labelId) {
 					if (parsedKey != undefined && inputId) {
 						let input = document.getElementById(inputId);
@@ -141,8 +174,8 @@ function getStuff() {
 					let span = document.getElementById(spanId);
 					if (parsedKey != undefined) {
 						span.classList.add('filled');
-						span.innerHTML = parsedKey.toProperCase();
-						if (spanId != 'mobileSpan') {
+						span.innerHTML = parsedKey;
+						if (spanId != 'mobileSpan' && spanId != 'pointsSpan') {
 							let img = document.createElement('img');
 							img.setAttributes({
 								'src': 'pencil_grey.svg'
@@ -176,6 +209,14 @@ function getStuff() {
 										span.classList.remove('hidden');
 									}, 300);
 								});
+								pauseButton.addEventListener('click', () => {
+									input.classList.add('hidden');
+									label.classList.add('hidden');
+									input.value = '';
+									window.setTimeout(() => {
+										span.classList.remove('hidden');
+									}, 300);
+								});
 							});
 						}
 					}
@@ -184,8 +225,8 @@ function getStuff() {
 						label.classList.add('hidden');
 					}
 				}
-				spanGen(parsedData.firstname, first, 'firstInput', '', 'firstSpan', 'firstLabel');
-				spanGen(parsedData.lastname, last, 'lastInput', '', 'lastSpan', 'lastLabel');
+				spanGen(parsedData.firstname.toProperCase(), first, 'firstInput', '', 'firstSpan', 'firstLabel');
+				spanGen(parsedData.lastname.toProperCase(), last, 'lastInput', '', 'lastSpan', 'lastLabel');
 				spanGen(parsedData.birthdate, birthdate, 'birthdateInput', 'date', 'birthdateSpan', 'birthdateLabel');
 				var dateInput = document.querySelector('#birthdateInput');
 				if (dateInput) {
@@ -197,6 +238,7 @@ function getStuff() {
 					});
 				}
 				spanGen(parsedPhone, mobile, '', 'tel', 'mobileSpan', 'mobileLabel');
+				spanGen(parsedPoints, points, '', 'number', 'pointsSpan', 'pointsLabel');
 				spanGen(parsedData.email, email, 'emailInput', 'email', 'emailSpan', 'emailLabel');
 				for (var i = 0; i < inputs.length; i++) {
 					inputs[i].addEventListener('click', () => {
@@ -212,18 +254,20 @@ function getStuff() {
 	});
 }
 getStuff();
-
 window.setInterval(() => {
 	if (!isPaused) {
 		getStuff();
 	} else {
 		return;
 	}
-}, 5000);
+}, 500);
 
 pauseButton.addEventListener('click', () => {
 	unPause();
 	getStuff();
+	for (var i = 0; i < inputs.length; i++) {
+		inputs[i].value = '';
+	}
 });
 
 function pushStuff() {
@@ -286,23 +330,9 @@ function pushStuff() {
 		});
 	});
 }
-pointsButton.addEventListener('click', () => {
-	let pointsQty = document.getElementById('pointsQty');
-	if (pointsQty.checkValidity()) {
-		var post_qty = pointsQty.value;
-		givePoints(post_qty);
-		getStuff();
-		pointsQty.value = '';
-		unPause();
-	} else {
-		pointsQty.setAttribute('invalid', '');
-	}
-});
 
 function givePoints(qty) {
-	http.get('http://www.repleotech.com/gateway/contactmanager_keyword.asp?user_guid=' + user + '&keyword=' + keyword + '&mobile=2693529412', function(res) {
-
-		//		'http://www.repleotech.com/gateway/kiosk_submission.asp?user_guid=' + user + '&kiosk=' + keyword + '&mobile=2693529412' + /* todo replace my number with post_mobile[0] + */ '&submission_type=loyalty &quantity=' + qty
+	http.get('http://www.repleotech.com/gateway/kiosk_submission.asp?user_guid=' + user + '&kiosk=' + keyword + '&mobile=2693529412' + /* todo replace my number with post_mobile[0] + */ '&submission_type=loyalty', (res) => {
 		/* todo use &submission_type=loyalty or =datacapture ? */
 
 		var statusCode = res.statusCode,

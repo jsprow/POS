@@ -24,47 +24,59 @@
 	</div>
 	<div class="to-hide">
 		<div class="box">
-			<!-- <p>First Name:</p> -->
 			<span id="first">
-				<input name="first-input" id="firstInput" value="">
-				<label id="firstLabel" for="first-input">First Name</label>
+				<input class="input" name="first-input" id="firstInput" value="">
+				<label class="input-label" id="firstLabel" for="first-input">First Name</label>
 				<span id="firstSpan" class="info-span"></span>
 			</span>
 		</div>
 		<div class="box">
 			<span id="last">
-				<input name="last-input" id="lastInput" value="">
-				<label id="lastLabel" for="last-input">Last Name</label>
+				<input  class="input"name="last-input" id="lastInput" value="">
+				<label id="lastLabel" class="input-label" for="last-input">Last Name</label>
         <span id="lastSpan" class="info-span"></span>
 			</span>
 		</div>
 		<div class="box">
 			<span id="birthdate">
-				<input id="birthdateInput" name="birthdate-input" type="date" value="">
-				<label id="birthdateLabel" for="birthdate-input"> Birthdate</label>
+				<input  class="input"id="birthdateInput" name="birthdate-input" type="date" value="">
+				<label id="birthdateLabel" class="input-label" for="birthdate-input"> Birthdate</label>
         <span id="birthdateSpan" class="info-span"></span>
 			</span>
 		</div>
 	</div>
 	<div class="box">
 		<span id="mobile" class="to-show">
-			<label id="mobileLabel" for="mobile-input"></label>
+			<label id="mobileLabel" class="input-label" for="mobile-input"></label>
       <span id="mobileSpan"></span>
 		</span>
 	</div>
 	<div class="box">
 		<span id="points" class="to-show">
-			<label id="pointsLabel" for="points-input"></label>
+			<label id="pointsLabel" class="input-label" for="points-input"></label>
       <span id="pointsSpan"></span>
 		</span>
 	</div>
 	<div class="to-hide">
 		<div class="box">
 			<span id="email">
-				<input name="email-input" id="emailInput" value="">
-				<label id="emailLabel" for="email-input">Email</label>
+				<input class="input" name="email-input" id="emailInput" value="">
+				<label id="emailLabel" class="input-label" for="email-input">Email</label>
         <span id="emailSpan" class="info-span"></span>
 			</span>
+		</div>
+		<div id="areyousure">
+			<p>Are you sure you want to redeem this customer's rewards?</p>
+			<button id="yes" class="confirm">Yes</button>
+			<button id="no" class="confirm">No</button>
+		</div>
+		<div id="kioskGroup">
+			<input id="kiosk1" class="kioskGroup-input" type="radio" name="kiosk" value="kiosk1">
+			<label class="kioskGroup-label" for="kiosk1">Kiosk 1</label>
+			<input id="kiosk2" class="kioskGroup-input" type="radio" name="kiosk" value="kiosk2">
+			<label class="kioskGroup-label" for="kiosk2">Kiosk 2</label>
+			<input id="kiosk3" class="kioskGroup-input" type="radio" name="kiosk" value="kiosk3">
+			<label class="kioskGroup-label" for="kiosk3">Kiosk 3</label>
 		</div>
 		<div class="bottom-bar">
 			<button class="refresh-button bottom-button">
@@ -84,9 +96,12 @@
 			<button class="bottom-button">
 				<img id="logModalButton" class="bottom-button__image" src="sticky-note-o.svg" alt="sticky">
 			</button>
+			</button>
+			<button class="bottom-button">
+				<img id="kioskButton" class="bottom-button__image" src="desktop.svg" alt="desktop">
+			</button>
 		</div>
 	</div>
-	<p id="status" style="position: absolute; bottom: 0; left: 0; width: 100%"></p>
 
 	<script src="connect.js"></script>
 	<script>

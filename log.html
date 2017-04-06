@@ -2,101 +2,117 @@
 <html lang="en">
 
 <head>
-  <meta charset="utf-8">
-  <title>Repleotech POS Log</title>
-  <meta name="viewport" content="width=device-width,minimum-scale=1,initial-scale=1">
-  <link rel="stylesheet" href="index.css">
+	<meta charset="utf-8">
+	<title>Repleotech POS Log</title>
+	<meta name="viewport" content="width=device-width,minimum-scale=1,initial-scale=1">
+	<link rel="stylesheet" href="index.css">
 </head>
 
-<body>
-  <a id="close" class="close-btn">&#10006;</a>
-  <table>
-    <thead>
-      <tr>
-        <th>timestamp</th>
-        <th>first name</th>
-        <th>last name</th>
-        <th>birthdate</th>
-        <th>mobile</th>
-        <th>email</th>
-      </tr>
-    </thead>
-    <tbody id="logTable"></tbody>
-  </table>
+<body class="log-body">
+	<a id="close" class="close-btn">&#10006;</a>
+	<table>
+		<thead>
+			<tr>
+				<th id="timestamp">timestamp</th>
+				<th id="first_name">first_name</th>
+				<th id="last_name">last_name</th>
+				<th id="birthdate">birthdate</th>
+				<th id="mobile">mobile</th>
+				<th id="points">points</th>
+				<th id="email">email</th>
+			</tr>
+		</thead>
+		<tbody id="logTable"></tbody>
+	</table>
 
-  <script src="ipc.js"></script>
-  <script>
-    var fs = require('fs');
-    var logClose = document.getElementById('close');
-    var logTable = document.getElementById('logTable');
-    var logArr = [];
+	<script src="ipc.js"></script>
+	<script>
+		var fs = require('fs');
+		var logClose = document.getElementById('close');
+		var logTable = document.getElementById('logTable');
+		var logArr = [];
+		var tdWidths = [];
+		var $ = require('jquery');
 
-    ipcRenderer.on('synchronous-reply', (event, arg)=> {
-      readLog();
-    });
-    ipcRenderer.send('asynchronous-message', 'ping');
+		ipcRenderer.on('synchronous-reply', (event, arg) => {
+			readLog();
+		});
+		ipcRenderer.send('asynchronous-message', 'ping');
 
-    function logModal() {
-  		ipcRenderer.messaging = {
-  			sendCloseLogWindow: function() {
-  				ipcRenderer.send('close-second-window', 'an-argument')
-  			},
+		function logModal() {
+			ipcRenderer.messaging = {
+				sendCloseLogWindow: function() {
+					ipcRenderer.send('close-second-window', 'an-argument')
+				},
 
-  			init: function() {
-  				logClose.addEventListener('click', function() {
-  					ipcRenderer.messaging.sendCloseLogWindow();
-  				});
-  			}
-  		};
-      ipcRenderer.messaging.init();
-    }
-    logModal();
-    function readLog() {
-      logTable.innerHTML = '';
-    	fs.readFile(path + '/log.txt', 'utf8', (err, data) => {
-    		if (err) throw err;
-    		let logJSON = data;
-    		let logSplit = logJSON.split('\n');
+				init: function() {
+					logClose.addEventListener('click', function() {
+						ipcRenderer.messaging.sendCloseLogWindow();
+					});
+				}
+			};
+			ipcRenderer.messaging.init();
+		}
+		logModal();
 
-    		for (var i in logSplit) {
-    			if (logSplit[i]) {
-    				let logEntry = JSON.parse(logSplit[i]),
-                timestamp = logEntry.timestamp,
-                first = logEntry.first,
-                last = logEntry.last,
-                birthdate = logEntry.birthdate,
-                mobile = logEntry.mobile,
-                email = logEntry.email,
+		function readLog() {
+			logTable.innerHTML = '';
+			fs.readFile(path + '/log.txt', 'utf8', (err, data) => {
+				if (err) throw err;
+				let logJSON = data;
+				let logSplit = logJSON.split('\n');
 
-                row = document.createElement('tr'),
-                tdTimestamp = document.createElement('td'),
+				for (var i in logSplit) {
+					if (logSplit[i]) {
+						let logEntry = JSON.parse(logSplit[i]),
+							timestamp = logEntry.timestamp,
+							first = logEntry.first,
+							last = logEntry.last,
+							birthdate = logEntry.birthdate,
+							mobile = logEntry.mobile,
+							points = logEntry.points,
+							email = logEntry.email,
 
-                tdFirst = document.createElement('td'),
-                tdLast = document.createElement('td'),
-                tdBirthdate = document.createElement('td'),
-                tdMobile = document.createElement('td'),
-                tdEmail = document.createElement('td');
+							row = document.createElement('tr'),
+							tdTimestamp = document.createElement('td'),
 
-            tdTimestamp.innerHTML = timestamp;
-            tdFirst.innerHTML = first;
-            tdLast.innerHTML = last;
-            tdBirthdate.innerHTML = birthdate;
-            tdMobile.innerHTML = mobile;
-            tdEmail.innerHTML = email;
+							tdFirst = document.createElement('td'),
+							tdLast = document.createElement('td'),
+							tdBirthdate = document.createElement('td'),
+							tdMobile = document.createElement('td'),
+							tdPoints = document.createElement('td'),
+							tdEmail = document.createElement('td');
 
-            row.appendChild(tdTimestamp);
-            row.appendChild(tdFirst);
-            row.appendChild(tdLast);
-            row.appendChild(tdBirthdate);
-            row.appendChild(tdMobile);
-            row.appendChild(tdEmail);
+						tdTimestamp.classList.add('timestamp');
+						tdFirst.classList.add('first');
+						tdLast.classList.add('last');
+						tdBirthdate.classList.add('birthdate');
+						tdMobile.classList.add('mobile');
+						tdPoints.classList.add('points');
+						tdEmail.classList.add('email');
 
-            logTable.appendChild(row);
-    			}
-    		}
-    	});
-    }
-  </script>
+						tdTimestamp.innerHTML = timestamp;
+						tdFirst.innerHTML = first;
+						tdLast.innerHTML = last;
+						tdBirthdate.innerHTML = birthdate;
+						tdMobile.innerHTML = mobile;
+						tdPoints.innerHTML = points;
+						tdEmail.innerHTML = email;
+
+						row.appendChild(tdTimestamp);
+						row.appendChild(tdFirst);
+						row.appendChild(tdLast);
+						row.appendChild(tdBirthdate);
+						row.appendChild(tdMobile);
+						row.appendChild(tdPoints);
+						row.appendChild(tdEmail);
+
+						logTable.appendChild(row);
+					}
+				}
+			});
+		}
+	</script>
 </body>
 
 </html>

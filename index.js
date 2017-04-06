@@ -64,10 +64,10 @@ ipcMain.on('close-second-window', (event, arg) => {
 	logWindow.hide();
 });
 ipcMain.on('shrink-window', (event, arg) => {
-	mainWindow.setSize(250, 160, true);
+	mainWindow.setSize(275, 180, true);
 });
 ipcMain.on('grow-window', (event, arg) => {
-	mainWindow.setSize(250, 420, true);
+	mainWindow.setSize(275, 450, true);
 });
 
 let mainWindow;
@@ -80,14 +80,14 @@ function onClosed() {
 
 function createMainWindow() {
 	const win = new electron.BrowserWindow({
-		backgroundColor: '#fff',
-		width: 250,
-		height: 420,
+		backgroundColor: '#ffffff',
+		width: 275,
+		height: 450,
 		frame: false,
-		x: 0,
-		y: 0,
 		title: 'Rewards App',
-		show: false
+		show: false,
+		minimizable: false,
+		maximizable: false
 	});
 	win.setAlwaysOnTop(true);
 	win.once('ready-to-show', () => {
@@ -103,8 +103,8 @@ function createMainWindow() {
 function createLogModal() {
 	const log = new electron.BrowserWindow({
 		parent: mainWindow,
-		width: 900,
-		height: 520,
+		width: 1000,
+		height: 550,
 		modal: true,
 		show: false,
 		frame: false
@@ -133,7 +133,7 @@ app.on('activate', () => {
 app.on('ready', () => {
 	mainWindow = createMainWindow();
 
-	mainWindow.webContents.openDevTools();
+	//mainWindow.webContents.openDevTools();
 
 	//display menu
 	const menu = Menu.buildFromTemplate(template);

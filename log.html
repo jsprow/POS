@@ -10,29 +10,36 @@
 
 <body class="log-body">
 	<a id="close" class="close-btn">&#10006;</a>
-	<table>
-		<thead>
-			<tr>
-				<th id="timestamp">timestamp</th>
-				<th id="first_name">first_name</th>
-				<th id="last_name">last_name</th>
-				<th id="birthdate">birthdate</th>
-				<th id="mobile">mobile</th>
-				<th id="points">points</th>
-				<th id="email">email</th>
-			</tr>
-		</thead>
-		<tbody id="logTable"></tbody>
-	</table>
+
+	<div id="constrainer">
+		<div class="scrolltable">
+			<table class="header">
+				<thead>
+					<tr>
+						<th>timestamp</th>
+						<th>kiosk</th>
+						<th>first_name</th>
+						<th>last_name</th>
+						<th>birthdate</th>
+						<th>mobile</th>
+						<th>points</th>
+						<th>email</th>
+					</tr>
+				</thead>
+			</table>
+			<div class="body">
+				<table>
+					<tbody id="logTable"></tbody>
+				</table>
+			</div>
+		</div>
+	</div>
 
 	<script src="ipc.js"></script>
 	<script>
-		var fs = require('fs');
-		var logClose = document.getElementById('close');
-		var logTable = document.getElementById('logTable');
-		var logArr = [];
-		var tdWidths = [];
-		var $ = require('jquery');
+		var fs = require('fs'),
+			logClose = document.getElementById('close'),
+			logTable = document.getElementById('logTable');
 
 		ipcRenderer.on('synchronous-reply', (event, arg) => {
 			readLog();
@@ -66,6 +73,7 @@
 					if (logSplit[i]) {
 						let logEntry = JSON.parse(logSplit[i]),
 							timestamp = logEntry.timestamp,
+							kiosk = logEntry.kiosk,
 							first = logEntry.first,
 							last = logEntry.last,
 							birthdate = logEntry.birthdate,
@@ -74,8 +82,9 @@
 							email = logEntry.email,
 
 							row = document.createElement('tr'),
-							tdTimestamp = document.createElement('td'),
 
+							tdTimestamp = document.createElement('td'),
+							tdKiosk = document.createElement('td'),
 							tdFirst = document.createElement('td'),
 							tdLast = document.createElement('td'),
 							tdBirthdate = document.createElement('td'),
@@ -83,7 +92,12 @@
 							tdPoints = document.createElement('td'),
 							tdEmail = document.createElement('td');
 
+						if (points == undefined) {
+							points = 0;
+						}
+
 						tdTimestamp.classList.add('timestamp');
+						tdKiosk.classList.add('kiosk');
 						tdFirst.classList.add('first');
 						tdLast.classList.add('last');
 						tdBirthdate.classList.add('birthdate');
@@ -92,6 +106,7 @@
 						tdEmail.classList.add('email');
 
 						tdTimestamp.innerHTML = timestamp;
+						tdKiosk.innerHTML = kiosk;
 						tdFirst.innerHTML = first;
 						tdLast.innerHTML = last;
 						tdBirthdate.innerHTML = birthdate;
@@ -100,6 +115,7 @@
 						tdEmail.innerHTML = email;
 
 						row.appendChild(tdTimestamp);
+						row.appendChild(tdKiosk);
 						row.appendChild(tdFirst);
 						row.appendChild(tdLast);
 						row.appendChild(tdBirthdate);

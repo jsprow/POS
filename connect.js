@@ -48,12 +48,15 @@ var post_mobile = [],
 	campaign = 'prkentwood',
 	keyword = 'prkentwood',
 	kiosk = fs.readFileSync(path + '/kiosk.txt').toString(),
+	kioskName,
 	currentLoyalty,
 	usedLoyalty,
 	parsedPoints;
+
 for (var i = 0; i < kioskArr.length; i++) {
 	if (kiosk == kioskArr[i].key) {
 		$('#' + kioskArr[i].name).attr('checked', true);
+		kioskName = kioskArr[i].name;
 	}
 }
 
@@ -128,10 +131,13 @@ for (var i = 0; i < kiosks.length; i++) {
 			pause();
 			if (pick.id == 'kiosk1') {
 				kiosk = '{0DCD53A6-FEBF-4AD3-B412-D26119D5FC06}';
+				kioskName = 'kiosk1';
 			} else if (pick.id == 'kiosk2') {
 				kiosk = '{46076CD3-BA4F-48EE-A2B2-51D9D52B468E}';
+				kioskName = 'kiosk2';
 			} else if (pick.id == 'kiosk3') {
 				kiosk = '{4B910699-82E9-4B0F-8E37-7195C48FF3FC}';
+				kioskName = 'kiosk3';
 			}
 			let replace = () => {
 				$("#first").load(location.href + " #first");
@@ -163,8 +169,6 @@ function unPause() {
 	refreshButton.classList.remove('paused');
 }
 //send call to get customer info
-console.log('http://www.repleotech.com/gateway/kiosk_last_checkin.asp?kiosk=' + kiosk + '&user_guid=' + user);
-
 function getStuff() {
 	http.get('http://www.repleotech.com/gateway/kiosk_last_checkin.asp?kiosk=' + kiosk + '&user_guid=' + user, (res) => {
 		var statusCode = res.statusCode,
@@ -197,6 +201,7 @@ function getStuff() {
 				post_mobile[0] = parsedData.mobile;
 				currentLoyalty = parsedData.current_loyalty;
 				usedLoyalty = parsedData.address;
+
 				if (!currentLoyalty) {
 					currentLoyalty = 0;
 				}
@@ -340,6 +345,9 @@ kioskButton.addEventListener('click', () => {
 	kioskGroup.classList.toggle('show');
 });
 
+function getInputs() {
+
+}
 function cashOut() {
 	if (!currentLoyalty) {
 		currentLoyalty = 0;
@@ -348,6 +356,7 @@ function cashOut() {
 		usedLoyalty = 0;
 	}
 	var parsedPoints = '$' + ((currentLoyalty - usedLoyalty) * 0.5).toFixed(2);
+
 	if (document.getElementById('firstInput') != null) {
 		var post_first = document.getElementById('firstInput').value;
 	} else {
@@ -377,6 +386,7 @@ function cashOut() {
 		timeStamp = month + "/" + date + "/" + year + " " + hour + ":" + min;
 	postData = JSON.stringify({
 		'timestamp': timeStamp,
+		'kiosk': kioskName,
 		'points': parsedPoints,
 		'mobile': post_mobile[0],
 		'first': post_first,
@@ -424,6 +434,14 @@ pauseButton.addEventListener('click', () => {
 });
 
 function pushStuff() {
+	if (!currentLoyalty) {
+		currentLoyalty = 0;
+	}
+	if (!usedLoyalty) {
+		usedLoyalty = 0;
+	}
+	var parsedPoints = '$' + ((currentLoyalty - usedLoyalty) * 0.5).toFixed(2);
+
 	if (document.getElementById('firstInput') != null) {
 		var post_first = document.getElementById('firstInput').value;
 	} else {
@@ -445,15 +463,17 @@ function pushStuff() {
 		var post_email = '';
 	}
 	let time = new Date,
-		month = time.getMonth(),
+		month = time.getMonth() + 1,
 		date = time.getDate(),
 		year = time.getFullYear(),
 		hour = time.getHours(),
 		min = (time.getMinutes() < 10 ? '0' : '') + time.getMinutes(),
 		timeStamp = month + "/" + date + "/" + year + " " + hour + ":" + min;
+
 	postData = JSON.stringify({
 		'timestamp': timeStamp,
-		'pts': points,
+		'kiosk': kioskName,
+		'points': parsedPoints,
 		'mobile': post_mobile[0],
 		'first': post_first,
 		'last': post_last,
@@ -463,7 +483,6 @@ function pushStuff() {
 	fs.appendFile(path + '/log.txt', postData + '\n', (err) => {
 		if (err) throw err;
 	});
-	console.log(post_first, post_last, post_birthdate, post_email, post_mobile[0]);
 	http.get('http://www.repleotech.com/gateway/contactmanager.asp?user_guid=' + user + '&campaign=' + campaign + '&keyword=' + keyword + '&firstname=' + post_first + '&lastname=' + post_last + '&birthdate=' + post_birthdate + '&email=' + post_email + '&mobile=' + post_mobile[0], (res) => {
 		var statusCode = res.statusCode,
 			contentType = res.headers['content-type'];

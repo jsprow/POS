@@ -21,6 +21,10 @@ const remote = require('electron').remote,
 			'name': 'kiosk3',
 			'key': '{0DCD53A6-FEBF-4AD3-B412-D26119D5FC06}'
 		},
+		// {
+		// 	'name': 'kiosk4',
+		// 	'key': '{276334FF-09DC-48C3-B64E-EA7DF48FA120}'
+		// }
 	],
 	spans = document.getElementsByClassName('info-span'),
 	first = document.getElementById('first'),
@@ -47,11 +51,19 @@ var post_mobile = [],
 	user = "{132643DA-4EFF-439C-847E-4AD7554D3D7A}",
 	campaign = 'prkentwood',
 	keyword = 'prkentwood',
-	kiosk = fs.readFileSync(path + '/kiosk.txt').toString(),
+	isFirst = false, //isFirst uses the 'state' field
+	kiosk,
 	kioskName,
 	currentLoyalty,
-	usedLoyalty,
+	usedLoyalty, //usedLoyalty uses the 'address' field
 	parsedPoints;
+
+if (fs.existsSync(path + '/kiosk.txt')) {
+	kiosk = fs.readFileSync(path + '/kiosk.txt');
+} else {
+	kiosk = '{4B910699-82E9-4B0F-8E37-7195C48FF3FC}';
+}
+
 
 for (var i = 0; i < kioskArr.length; i++) {
 	if (kiosk == kioskArr[i].key) {
@@ -139,11 +151,18 @@ for (var i = 0; i < kiosks.length; i++) {
 				kiosk = '{4B910699-82E9-4B0F-8E37-7195C48FF3FC}';
 				kioskName = 'kiosk3';
 			}
+			// else if (pick.id == 'kiosk4') {
+			// 	kiosk = '{276334FF-09DC-48C3-B64E-EA7DF48FA120}';
+			// 	kioskName = 'kiosk4';
+			// }
+			if (pick.id == kioskName) {
+				kioskClick(pick);
+			}
 			let replace = () => {
-				$("#first").load(location.href + " #first");
-				$("#last").load(location.href + " #last");
-				$("#birthdate").load(location.href + " #birthdate");
-				$("#email").load(location.href + " #email");
+				first.replaceWith(first);
+				last.replaceWith(last);
+				birthdate.replaceWith(birthdate);
+				email.replaceWith(email);
 			}
 			$.when(replace()).done(() => {
 				getStuff();
@@ -200,7 +219,33 @@ function getStuff() {
 
 				post_mobile[0] = parsedData.mobile;
 				currentLoyalty = parsedData.current_loyalty;
-				usedLoyalty = parsedData.address;
+				usedLoyalty = parsedData.address; //uses 'address' field
+
+				if (currentLoyalty == 1) {
+					console.log('currentLoyalty: ' + currentLoyalty);
+					isFirst = true;
+					currentLoyalty = currentLoyalty + 1;
+
+					http.get('http://www.repleotech.com/gateway/contactmanager.asp?user_guid=' + user + '&mobile=' + post_mobile[0] + '&state=true', (res) => {
+						var statusCode = res.statusCode,
+							contentType = res.headers['content-type'];
+						var error;
+						if (statusCode !== 200) {
+							error = new Error("Request Failed.\n" +
+								"Status Code: " + statusCode);
+						}
+						if (error) {
+							console.log(error.message);
+							res.resume();
+							return
+						}
+						res.setEncoding('utf8');
+						var rawData = '';
+						res.on('data', function(chunk) {
+							console.log(rawData += chunk);
+						});
+					});
+				}
 
 				if (!currentLoyalty) {
 					currentLoyalty = 0;
@@ -211,14 +256,33 @@ function getStuff() {
 				var parsedPoints = '$' + ((currentLoyalty - usedLoyalty) * 0.5).toFixed(2);
 
 				function spanGen(parsedKey, element, inputId, type, spanId, labelId) {
-					let span = document.getElementById(spanId);
-					if (parsedKey != undefined && inputId) {
-						let input = document.getElementById(inputId);
-						input.classList.add('hidden');
+					var span = document.getElementById(spanId),
+						input = document.getElementById(inputId),
+						label = document.getElementById(labelId);
+					input = document.getElementById(inputId);
+
+					if (parsedKey === undefined) {
+						span.classList.add('hidden');
+						span.classList.remove('filled');
+						span.innerHTML = '';
+						if (input) {
+							input.classList.remove('hidden');
+						}
+						if (label) {
+							label.classList.remove('hidden');
+						}
 					}
+
 					if (parsedKey != undefined) {
+						let spanP = document.createElement('p');
+						spanP.innerHTML = parsedKey;
+						span.classList.remove('hidden');
 						span.classList.add('filled');
-						span.innerHTML = parsedKey;
+						span.innerHTML = '';
+						span.appendChild(spanP);
+						if (input) {
+							input.classList.add('hidden');
+						}
 						if (spanId != 'mobileSpan' && spanId != 'pointsSpan') {
 							let img = document.createElement('img');
 							img.setAttributes({
@@ -228,9 +292,9 @@ function getStuff() {
 							span.appendChild(img);
 							img.addEventListener('click', () => {
 								pause();
-								let input = document.getElementById(inputId);
-								let span = document.getElementById(spanId);
-								let label = document.getElementById(labelId);
+								input = document.getElementById(inputId);
+								span = document.getElementById(spanId);
+								label = document.getElementById(labelId);
 								span.classList.add('hidden');
 								label.classList.add('hidden');
 								window.setTimeout(() => {
@@ -263,9 +327,9 @@ function getStuff() {
 								});
 							});
 						}
-					}
+					} else {}
 					if (span.classList.contains('filled')) {
-						let label = document.getElementById(labelId);
+						label = document.getElementById(labelId);
 						label.classList.add('hidden');
 					}
 				}
@@ -334,20 +398,27 @@ submitButton.addEventListener('click', () => {
 });
 //kiosk picker
 var kioskPause = false;
-kioskButton.addEventListener('click', () => {
-	if (kioskPause) {
-		kioskPause = false;
-		unPause();
-	} else {
-		kioskPause = true;
-		pause();
-	}
-	kioskGroup.classList.toggle('show');
-});
 
-function getInputs() {
-
+function kioskClick(button) {
+	button.addEventListener('click', () => {
+		if (kioskGroup.classList.contains('show')) {
+			kioskPause = true;
+		} else {
+			kioskPause = false;
+		}
+		if (kioskPause) {
+			kioskPause = false;
+			unPause();
+		} else {
+			kioskPause = true;
+			pause();
+		}
+		kioskGroup.classList.toggle('show');
+	});
 }
+
+kioskClick(kioskButton);
+
 function cashOut() {
 	if (!currentLoyalty) {
 		currentLoyalty = 0;
@@ -389,6 +460,7 @@ function cashOut() {
 		'kiosk': kioskName,
 		'points': parsedPoints,
 		'mobile': post_mobile[0],
+		'isFirst': isFirst,
 		'first': post_first,
 		'last': post_last,
 		'birthdate': post_birthdate,
@@ -397,7 +469,7 @@ function cashOut() {
 	fs.appendFile(path + '/log.txt', postData + '\n', (err) => {
 		if (err) throw err;
 	});
-	http.get('http://www.repleotech.com/gateway/contactmanager.asp?user_guid=' + user + '&mobile=' + post_mobile[0] + '&address=' + currentLoyalty, (res) => {
+	http.get('http://www.repleotech.com/gateway/contactmanager.asp?user_guid=' + user + '&mobile=' + post_mobile[0] + '&address=' + currentLoyalty + '&state=false', (res) => {
 		var statusCode = res.statusCode,
 			contentType = res.headers['content-type'];
 		var error;
@@ -423,7 +495,7 @@ window.setInterval(() => {
 	} else {
 		return;
 	}
-}, 1000);
+}, 2000);
 
 pauseButton.addEventListener('click', () => {
 	unPause();

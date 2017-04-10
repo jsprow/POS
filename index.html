@@ -19,8 +19,14 @@
 		</div>
 	</div>
 	<div id="updateBox" class="update-box">
-		<span id="version">vX.Y.Z</span>
 		<div id="messages"></div>
+		<div class="load-wrapp">
+			<div class="load-3">
+				<div class="line"></div>
+				<div class="line"></div>
+				<div class="line"></div>
+			</div>
+		</div>
 	</div>
 	<div class="to-hide">
 		<div class="box">
@@ -77,6 +83,8 @@
 			<label class="kioskGroup-label" for="kiosk2">Kiosk 2</label>
 			<input id="kiosk3" class="kioskGroup-input" type="radio" name="kiosk" value="kiosk3">
 			<label class="kioskGroup-label" for="kiosk3">Kiosk 3</label>
+			<!-- <input id="kiosk4" class="kioskGroup-input" type="radio" name="kiosk" value="kiosk4">
+			<label class="kioskGroup-label" for="kiosk4">Kiosk Test</label> -->
 		</div>
 		<div class="bottom-bar">
 			<button class="refresh-button bottom-button">
@@ -91,9 +99,9 @@
 				<img src="paper-plane.svg" class="bottom-button__image" alt="">
 			</button>
 			<button id="pointsButton" class="bottom-button">
-				<p class="bottom-button__text">$</p>
+				<p class="bottom-button__text">Redeem</p>
 			</button>
-			<button class="bottom-button">
+			<button class="bottom-button" style="visibility:hidden;width:0;height:0;position:absolute;pointer-events:none;"><!-- TODO:  Show this button if you want-->
 				<img id="logModalButton" class="bottom-button__image" src="sticky-note-o.svg" alt="sticky">
 			</button>
 			</button>
@@ -105,12 +113,9 @@
 
 	<script src="connect.js"></script>
 	<script>
-		let version = window.location.hash.substring(1),
-			updateBox = document.getElementById('updateBox'),
+		let	updateBox = document.getElementById('updateBox'),
 			container = document.getElementById('messages'),
 			message = document.createElement('div');
-
-		document.getElementById('version').innerText = version;
 
 		ipcRenderer.on('show-update-bar', (event) => {
 			updateBox.classList.add('show');
@@ -118,8 +123,7 @@
 
 		ipcRenderer.on('message', (event, text) => {
 			message.innerHTML = text;
-			container.innerHTML = '';
-			container.appendChild(message);
+			container.innerHTML = message;
 		});
 	</script>
 </body>

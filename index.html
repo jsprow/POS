@@ -28,6 +28,16 @@
 			</div>
 		</div>
 	</div>
+	<button id="prefsButton" class="button">
+		<img src="gear.svg" class="button__image" alt="">
+	</button>
+	<div id="prefsBox">
+		<select name="client" id="clientPicker"></select>
+		<select name="kiosk" id="kioskPicker"></select>
+		<button id="prefsSubmit" class="button" type="submit">
+			<p class="button__text">Submit</p>
+		</button>
+	</div>
 	<div class="to-hide">
 		<div class="box">
 			<span id="first">
@@ -78,11 +88,11 @@
 		</div>
 		<div id="kioskGroup">
 			<input id="kiosk1" class="kioskGroup-input" type="radio" name="kiosk" value="kiosk1">
-			<label class="kioskGroup-label" for="kiosk1">Kiosk 1</label>
+			<label class="kioskGroup-label" for="kiosk1">Station 2</label>
 			<input id="kiosk2" class="kioskGroup-input" type="radio" name="kiosk" value="kiosk2">
-			<label class="kioskGroup-label" for="kiosk2">Kiosk 2</label>
+			<label class="kioskGroup-label" for="kiosk2">Station 5</label>
 			<input id="kiosk3" class="kioskGroup-input" type="radio" name="kiosk" value="kiosk3">
-			<label class="kioskGroup-label" for="kiosk3">Kiosk 3</label>
+			<label class="kioskGroup-label" for="kiosk3">Station 6</label>
 			<!-- <input id="kiosk4" class="kioskGroup-input" type="radio" name="kiosk" value="kiosk4">
 			<label class="kioskGroup-label" for="kiosk4">Kiosk Test</label> -->
 		</div>
@@ -101,7 +111,7 @@
 			<button id="pointsButton" class="bottom-button">
 				<p class="bottom-button__text">Redeem</p>
 			</button>
-			<button class="bottom-button" style="visibility:hidden;width:0;height:0;position:absolute;pointer-events:none;"><!-- TODO:  Show this button if you want-->
+			<button class="bottom-button" style="visibility:hidden;position:absolute;"><!-- TODO:  Show this button if you want-->
 				<img id="logModalButton" class="bottom-button__image" src="sticky-note-o.svg" alt="sticky">
 			</button>
 			</button>
@@ -112,18 +122,17 @@
 	</div>
 
 	<script src="connect.js"></script>
+	<script src="prefs.js"></script>
 	<script>
-		let	updateBox = document.getElementById('updateBox'),
-			container = document.getElementById('messages'),
-			message = document.createElement('div');
+		let updateBox = document.getElementById('updateBox'),
+			message = document.getElementById('messages');
 
 		ipcRenderer.on('show-update-bar', (event) => {
 			updateBox.classList.add('show');
 		});
 
 		ipcRenderer.on('message', (event, text) => {
-			message.innerHTML = text;
-			container.innerHTML = message;
+			message.innerText = text;
 		});
 	</script>
 </body>

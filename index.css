@@ -53,7 +53,13 @@ body {
 	height: 30px;
 	margin: 25px 25px;
 }
-.update-box {
+#prefsButton {
+	position: absolute;
+	bottom: 55px;
+	left: 5px;
+}
+.update-box,
+#prefsBox {
 	position: absolute;
 	top: 0;
 	left: 50%;
@@ -61,7 +67,6 @@ body {
 	display: flex;
 
 	width: max-content;
-	height: 30px;
 
 	transition: transform 400ms;
 	transform: translate(-50%, 0);
@@ -77,9 +82,25 @@ body {
 	align-items: center;
 	z-index: 5;
 }
-.update-box.show {
+#prefsBox {
+	transform: translate(-50%, -375px);
+	width: 90%;
+	height: 300px;
+}
+.update-box {
+	height: 30px;
+}
+.update-box.show,
+#prefsBox.show {
 	transition: transform 400ms ease-in-out;
 	transform: translate(-50%, 75px);
+}
+#prefsSubmit {
+	position: absolute;
+	bottom: 5px;
+}
+#prefsSubmit p {
+	color: #444;
 }
 #messages {
 	text-align: center;
@@ -532,6 +553,7 @@ color: #fff
 	justify-content: space-around;
 	align-items: center;
 }
+.button,
 .bottom-button {
 	display: flex;
 	flex-direction: column;
@@ -554,6 +576,7 @@ color: #fff
 	border: 2px solid #ccc;
 	border-radius: 4px;
 }
+.button__text,
 .bottom-button__text {
 	display: inline-block;
 	width: 100%;
@@ -563,6 +586,7 @@ color: #fff
 
 	font-size: 24px;
 }
+.button__image,
 .bottom-button__image {
 	width: 100%;
 	margin: 0;

@@ -51,20 +51,22 @@ var post_mobile = [],
 	user = "{132643DA-4EFF-439C-847E-4AD7554D3D7A}",
 	campaign = 'prkentwood',
 	keyword = 'prkentwood',
-	isFirst = false, //isFirst uses the 'state' field
+	isFirst, //isFirst uses the 'state' field
 	kiosk,
 	kioskName,
 	currentLoyalty,
 	usedLoyalty, //usedLoyalty uses the 'address' field
+	adjustedLoyalty,
 	parsedPoints;
 
+//check if kiosk guid is logged
 if (fs.existsSync(path + '/kiosk.txt')) {
 	kiosk = fs.readFileSync(path + '/kiosk.txt');
 } else {
 	kiosk = '{4B910699-82E9-4B0F-8E37-7195C48FF3FC}';
 }
 
-
+//set kiosk name
 for (var i = 0; i < kioskArr.length; i++) {
 	if (kiosk == kioskArr[i].key) {
 		$('#' + kioskArr[i].name).attr('checked', true);
@@ -72,6 +74,7 @@ for (var i = 0; i < kioskArr.length; i++) {
 	}
 }
 
+//log screen code
 function ipcFunction() {
 	ipcRenderer.messaging = {
 		sendShrink: () => {
@@ -220,12 +223,13 @@ function getStuff() {
 				post_mobile[0] = parsedData.mobile;
 				currentLoyalty = parsedData.current_loyalty;
 				usedLoyalty = parsedData.address; //uses 'address' field
+				isFirst = parsedData.state;
 
-				if (currentLoyalty == 1) {
-					console.log('currentLoyalty: ' + currentLoyalty);
-					isFirst = true;
-					currentLoyalty = currentLoyalty + 1;
+				if (isFirst == 'true') {
+					currentLoyalty = parseInt(currentLoyalty) + 1;
+				}
 
+				if (currentLoyalty == 1 && isFirst == undefined) {
 					http.get('http://www.repleotech.com/gateway/contactmanager.asp?user_guid=' + user + '&mobile=' + post_mobile[0] + '&state=true', (res) => {
 						var statusCode = res.statusCode,
 							contentType = res.headers['content-type'];
@@ -253,13 +257,22 @@ function getStuff() {
 				if (!usedLoyalty) {
 					usedLoyalty = 0;
 				}
+
 				var parsedPoints = '$' + ((currentLoyalty - usedLoyalty) * 0.5).toFixed(2);
 
 				function spanGen(parsedKey, element, inputId, type, spanId, labelId) {
 					var span = document.getElementById(spanId),
 						input = document.getElementById(inputId),
 						label = document.getElementById(labelId);
-					input = document.getElementById(inputId);
+					if (span) {
+						span.classList.add('hidden');
+					}
+					if (input) {
+						input.classList.add('hidden');
+					}
+					if (label) {
+						label.classList.add('hidden');
+					}
 
 					if (parsedKey === undefined) {
 						span.classList.add('hidden');
@@ -327,7 +340,7 @@ function getStuff() {
 								});
 							});
 						}
-					} else {}
+					}
 					if (span.classList.contains('filled')) {
 						label = document.getElementById(labelId);
 						label.classList.add('hidden');
@@ -420,6 +433,9 @@ function kioskClick(button) {
 kioskClick(kioskButton);
 
 function cashOut() {
+	if (isFirst == 'true') {
+		currentLoyalty = parseInt(currentLoyalty) - 1;
+	}
 	if (!currentLoyalty) {
 		currentLoyalty = 0;
 	}
@@ -460,7 +476,6 @@ function cashOut() {
 		'kiosk': kioskName,
 		'points': parsedPoints,
 		'mobile': post_mobile[0],
-		'isFirst': isFirst,
 		'first': post_first,
 		'last': post_last,
 		'birthdate': post_birthdate,
@@ -495,7 +510,7 @@ window.setInterval(() => {
 	} else {
 		return;
 	}
-}, 2000);
+}, 2500);
 
 pauseButton.addEventListener('click', () => {
 	unPause();

@@ -133,8 +133,8 @@ app.on('activate', () => {
 
 app.on('ready', () => {
 	mainWindow = createMainWindow();
-
-	mainWindow.webContents.openDevTools();
+	//show devtools
+	//mainWindow.webContents.openDevTools();
 
 	//display menu
 	const menu = Menu.buildFromTemplate(template);
@@ -146,24 +146,24 @@ app.on('ready', () => {
 		mainWindow.webContents.send('message', text);
 	}
 	autoUpdater.on('checking-for-update', () => {
-		sendStatusToWindow('Checking for update...');
+		sendStatusToWindow('Checking for update');
 		mainWindow.webContents.send('show-update-bar');
 	});
 	autoUpdater.on('update-available', (ev, info) => {
-		sendStatusToWindow('Update available.');
+		sendStatusToWindow('Update available');
 		mainWindow.webContents.send('show-update-bar');
 	});
 	autoUpdater.on('update-not-available', (ev, info) => {
-		sendStatusToWindow('Update not available.');
+		sendStatusToWindow('Update not available');
 	});
 	autoUpdater.on('error', (ev, err) => {
-		sendStatusToWindow('Error in auto-updater.');
+		sendStatusToWindow('Error in auto-updater');
 	});
 	autoUpdater.on('download-progress', (ev, progressObj) => {
 		sendStatusToWindow('Downloading... Just a sec');
 	});
 	autoUpdater.on('update-downloaded', (ev, info) => {
-		sendStatusToWindow('Installing...');
+		sendStatusToWindow('Installing... Almost there');
 	});
 
 });

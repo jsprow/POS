@@ -134,7 +134,7 @@ app.on('activate', () => {
 app.on('ready', () => {
 	mainWindow = createMainWindow();
 
-	mainWindow.webContents.openDevTools();
+	// mainWindow.webContents.openDevTools();
 
 	//display menu
 	const menu = Menu.buildFromTemplate(template);

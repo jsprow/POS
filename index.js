@@ -77,7 +77,7 @@ function createMainWindow() {
 	const win = new electron.BrowserWindow({
 		backgroundColor: '#ffffff',
 		width: 275,
-		height: 450,
+		height: 500,
 		frame: false,
 		title: 'Rewards App',
 		show: false,

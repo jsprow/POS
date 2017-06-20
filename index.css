@@ -247,10 +247,17 @@ p.hidden {
 	width: 100%;
 	min-height: 38px;
 	margin-top: 10px;
+	margin-left: 20px;
 
 	flex-flow: row nowrap;
 	justify-content: space-between;
 	align-items: center;
+}
+.date-icon {
+	position: absolute;
+	left: -25px;
+	width: 15px;
+	height: 15px;
 }
 .button-box {
 	flex-flow: column nowrap;
@@ -262,9 +269,8 @@ p.hidden {
 	display: flex;
 	overflow: hidden;
 
-	width: 100%;
+	width: 90%;
 	height: 38px;
-	margin-right: 20px;
 
 	flex-flow: row nowrap;
 	align-items: center;

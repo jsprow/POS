@@ -9,26 +9,30 @@ const remote = require('electron').remote,
 	kioskArr = [
 		{
 			name: 'kiosk1',
-			key: '{4B910699-82E9-4B0F-8E37-7195C48FF3FC}'
+			key: '{F88575A4-7484-401B-9890-D69E004925DF}'
 		},
 		{
 			name: 'kiosk2',
-			key: '{46076CD3-BA4F-48EE-A2B2-51D9D52B468E}'
+			key: '{02A84516-88E1-4BE7-AD30-F1ACE961BF9D}'
 		},
 		{
 			name: 'kiosk3',
-			key: '{0DCD53A6-FEBF-4AD3-B412-D26119D5FC06}'
+			key: '{EDDF031C-F147-45FD-8CB6-8FFFF979BF15}'
+		},
+		{
+			name: 'kiosk4',
+			key: '{13DB79E6-787A-46E1-9406-511F12C3CCE3}'
+		},
+		{
+			name: 'kiosk5',
+			key: '{5B5ADCEA-50C3-4DB5-B354-10CFB9896B7A}'
 		}
-		// PR Test guid
-		// {
-		// 	'name': 'kiosk4',
-		// 	'key': '{276334FF-09DC-48C3-B64E-EA7DF48FA120}'
-		// }
 	],
 	spans = document.getElementsByClassName('info-span'),
 	first = document.getElementById('first'),
 	last = document.getElementById('last'),
 	birthdate = document.getElementById('birthdate'),
+	anniversary = document.getElementById('anniversary'),
 	mobile = document.getElementById('mobile'),
 	email = document.getElementById('email'),
 	points = document.getElementById('points'),
@@ -46,19 +50,25 @@ const remote = require('electron').remote,
 var post_mobile = [],
 	isPaused = false,
 	inputs = document.getElementsByClassName('input'),
-	user = '{132643DA-4EFF-439C-847E-4AD7554D3D7A}',
-	keyword = 'bells',
+	user = '{D4B04CA7-E7B6-4E56-B9EF-1BA589D2EF55}',
+	keyword = 'wedels',
 	isFirst = false, //isFirst uses the 'state' field
 	kiosk,
 	kioskName,
 	currentLoyalty,
 	usedLoyalty, //usedLoyalty uses the 'address' field
-	parsedPoints
+	parsedPoints,
+	today = new Date(),
+	month = today.getMonth() + 1,
+	day = today.getDate(),
+	todayString
+
+todayString = ('0' + month).slice(-2) + '-' + ('0' + day).slice(-2)
 
 if (fs.existsSync(path + '/kiosk.txt')) {
 	kiosk = fs.readFileSync(path + '/kiosk.txt')
 } else {
-	kiosk = '{4B910699-82E9-4B0F-8E37-7195C48FF3FC}'
+	kiosk = '{F88575A4-7484-401B-9890-D69E004925DF}'
 }
 
 for (var i = 0; i < kioskArr.length; i++) {
@@ -138,19 +148,21 @@ for (var i = 0; i < kiosks.length; i++) {
 		pick.addEventListener('change', () => {
 			pause()
 			if (pick.id == 'kiosk1') {
-				kiosk = '{0DCD53A6-FEBF-4AD3-B412-D26119D5FC06}'
-				kioskName = 'kiosk1'
+				kiosk = kioskArr[0].key
+				kioskName = kioskArr[0].name
 			} else if (pick.id == 'kiosk2') {
-				kiosk = '{46076CD3-BA4F-48EE-A2B2-51D9D52B468E}'
-				kioskName = 'kiosk2'
+				kiosk = kioskArr[1].key
+				kioskName = kioskArr[1].name
 			} else if (pick.id == 'kiosk3') {
-				kiosk = '{4B910699-82E9-4B0F-8E37-7195C48FF3FC}'
-				kioskName = 'kiosk3'
+				kiosk = kioskArr[2].key
+				kioskName = kioskArr[2].name
+			} else if (pick.id == 'kiosk4') {
+				kiosk = kioskArr[3].key
+				kioskName = kioskArr[3].name
+			} else if (pick.id == 'kiosk5') {
+				kiosk = kioskArr[4].key
+				kioskName = kioskArr[4].name
 			}
-			// else if (pick.id == 'kiosk4') {
-			// 	kiosk = '{276334FF-09DC-48C3-B64E-EA7DF48FA120}';
-			// 	kioskName = 'kiosk4';
-			// }
 			if (pick.id == kioskName) {
 				kioskClick(pick)
 			}
@@ -158,6 +170,7 @@ for (var i = 0; i < kiosks.length; i++) {
 				first.replaceWith(first)
 				last.replaceWith(last)
 				birthdate.replaceWith(birthdate)
+				anniversary.replaceWith(anniversary)
 				email.replaceWith(email)
 			}
 			$.when(replace()).done(() => {
@@ -219,12 +232,12 @@ function getStuff() {
 
 						post_mobile[0] = parsedData.mobile
 						currentLoyalty = parsedData.current_loyalty
-						usedLoyalty = parsedData.address //uses 'address' field
+						usedLoyalty = parseFloat(parsedData.address) //uses 'address' field for loyalty points used and finds difference between current loyalty
 
 						if (currentLoyalty == 1) {
 							console.log('currentLoyalty: ' + currentLoyalty)
 							isFirst = true
-							currentLoyalty = currentLoyalty + 1
+							currentLoyalty = parseFloat(currentLoyalty)
 
 							http.get(
 								'http://www.repleotech.com/gateway/contactmanager.asp?user_guid=' +
@@ -261,7 +274,14 @@ function getStuff() {
 						if (!usedLoyalty) {
 							usedLoyalty = 0
 						}
-						var parsedPoints = '$' + ((currentLoyalty - usedLoyalty) * 0.5).toFixed(2)
+						var actualLoyalty = (currentLoyalty - usedLoyalty)
+							console.log(currentLoyalty, usedLoyalty, actualLoyalty)
+
+						if ((actualLoyalty === 1)) {
+							var parsedPoints = actualLoyalty + ' Point '
+						} else {
+							var parsedPoints = actualLoyalty + ' Points '
+						}
 
 						function spanGen(parsedKey, element, inputId, type, spanId, labelId) {
 							var span = document.getElementById(spanId),
@@ -294,7 +314,7 @@ function getStuff() {
 								if (spanId != 'mobileSpan' && spanId != 'pointsSpan') {
 									let img = document.createElement('img')
 									img.setAttributes({
-										src: 'pencil_grey.svg'
+										src: 'icons/pencil_grey.svg'
 									})
 									img.classList.add('edit-img')
 									span.appendChild(img)
@@ -359,12 +379,48 @@ function getStuff() {
 							'birthdateSpan',
 							'birthdateLabel'
 						)
+						spanGen(
+							parsedData.city,
+							anniversary,
+							'anniversaryInput',
+							'date',
+							'anniversarySpan',
+							'anniversaryLabel'
+						)
+						var dateStyle = 'color: #35bf51; font-weight: bold;'
 						var dateInput = document.querySelector('#birthdateInput')
 						if (dateInput) {
+							if (parsedData.birthdate) {
+								if (parsedData.birthdate.slice(-5) === todayString) {
+									document.getElementById(
+										'birthdateSpan'
+									).style.cssText = dateStyle
+								} else {
+									document.getElementById('birthdateSpan').style.cssText = ''
+								}
+							}
 							dateInput.addEventListener('keyup', e => {
 								$('#birthdateInput').addClass('date-changed')
 								if (dateInput.validity.valid) {
 									$('#birthdateInput').addClass('valid')
+								}
+							})
+						}
+						var anniversaryDateInput = document.querySelector('#anniversaryInput')
+						if (anniversaryDateInput) {
+							if (parsedData.city) {
+								if (parsedData.city.slice(-5) === todayString) {
+									document.getElementById(
+										'anniversarySpan'
+									).style.color = dateStyle
+								} else {
+									document.getElementById('anniversarySpan').style.color = ''
+								}
+							}
+							dateInput.addEventListener('keyup', e => {
+								$('#anniversaryInput').addClass('date-changed')
+								if (dateInput.validity.valid) {
+									$('#anniversaryInput').addClass('valid')
 								}
 							})
 						}
@@ -475,6 +531,11 @@ function cashOut() {
 	} else {
 		var post_birthdate = ''
 	}
+	if (document.getElementById('anniversaryInput') != null) {
+		var post_anniversary = document.getElementById('anniversaryInput').value
+	} else {
+		var post_anniversary = ''
+	}
 	if (document.getElementById('emailInput') != null) {
 		var post_email = document.getElementById('emailInput').value
 	} else {
@@ -496,6 +557,7 @@ function cashOut() {
 		first: post_first,
 		last: post_last,
 		birthdate: post_birthdate,
+		anniversary: post_anniversary,
 		email: post_email
 	})
 	fs.appendFile(path + '/log.txt', postData + '\n', err => {
@@ -568,6 +630,11 @@ function pushStuff() {
 	} else {
 		var post_birthdate = ''
 	}
+	if (document.getElementById('anniversaryInput') != null) {
+		var post_anniversary = document.getElementById('anniversaryInput').value
+	} else {
+		var post_anniversary = ''
+	}
 	if (document.getElementById('emailInput') != null) {
 		var post_email = document.getElementById('emailInput').value
 	} else {
@@ -589,6 +656,7 @@ function pushStuff() {
 		first: post_first,
 		last: post_last,
 		birthdate: post_birthdate,
+		anniversary: post_anniversary,
 		email: post_email
 	})
 	fs.appendFile(path + '/log.txt', postData + '\n', err => {
@@ -605,6 +673,8 @@ function pushStuff() {
 			post_last +
 			'&birthdate=' +
 			post_birthdate +
+			'&city=' +
+			post_anniversary +
 			'&email=' +
 			post_email +
 			'&mobile=' +

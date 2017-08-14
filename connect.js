@@ -36,12 +36,19 @@ const remote = require('electron').remote,
 	mobile = document.getElementById('mobile'),
 	email = document.getElementById('email'),
 	points = document.getElementById('points'),
+	couponsBox = document.getElementById('couponsBox'),
 	logButton = document.getElementById('logModalButton'),
 	submitButton = document.getElementById('submitButton'),
-	pointsButton = document.getElementById('pointsButton'),
-	pointsYes = document.getElementById('yes'),
-	pointsNo = document.getElementById('no'),
-	confirmation = document.getElementById('areyousure'),
+	settingsButton = document.getElementById('settingsButton'),
+	settingsBox = document.getElementById('settingsBox'),
+	addCouponButton = document.getElementById('addCouponButton'),
+	useCouponButton = document.getElementById('useCouponButton'),
+	addYes = document.getElementById('addYes'),
+	redeemYes = document.getElementById('redeemYes'),
+	addNo = document.getElementById('addNo'),
+	redeemNo = document.getElementById('redeemNo'),
+	confirmationAdd = document.getElementById('areYouSureAdd'),
+	confirmationRedeem = document.getElementById('areYouSureRedeem'),
 	hideButton = document.getElementById('hideButton'),
 	refreshButton = document.getElementById('refresh'),
 	pauseButton = document.getElementById('pause'),
@@ -51,6 +58,7 @@ var post_mobile = [],
 	isPaused = false,
 	inputs = document.getElementsByClassName('input'),
 	user = '{D4B04CA7-E7B6-4E56-B9EF-1BA589D2EF55}',
+	coupon_guid = '{BFA971C7-D403-4067-9C2F-779DBE7E84AD}',
 	keyword = 'wedels',
 	isFirst = false, //isFirst uses the 'state' field
 	kiosk,
@@ -65,10 +73,16 @@ var post_mobile = [],
 
 todayString = ('0' + month).slice(-2) + '-' + ('0' + day).slice(-2)
 
+if (fs.existsSync(path + '/user.txt')) {
+	user = fs.readFileSync(path + '/user.txt')
+	console.log(user)
+} else {
+	kiosk = '{D4B04CA7-E7B6-4E56-B9EF-1BA589D2EF55}'
+}
 if (fs.existsSync(path + '/kiosk.txt')) {
 	kiosk = fs.readFileSync(path + '/kiosk.txt')
 } else {
-	kiosk = '{F88575A4-7484-401B-9890-D69E004925DF}'
+	kiosk = '{9A91681B-7148-460C-9D02-ACBB0455C403}'
 }
 
 for (var i = 0; i < kioskArr.length; i++) {
@@ -141,6 +155,15 @@ String.prototype.toProperCase = function() {
 		return txt.charAt(0).toUpperCase() + txt.substr(1).toLowerCase()
 	})
 }
+//open settings menu
+settingsButton.addEventListener('click', () => {
+	if (!isPaused) {
+		pause()
+	} else {
+		unPause()
+	}
+	settingsBox.classList.toggle('show')
+})
 //choose kiosk
 for (var i = 0; i < kiosks.length; i++) {
 	let pick = kiosks[i]
@@ -197,7 +220,163 @@ function unPause() {
 	refreshButton.classList.remove('paused')
 }
 //send call to get customer info
+function couponGen(id, name) {
+	let coupon = document.createElement('div'),
+		couponName = document.createElement('p'),
+		couponRedeem = document.createElement('div')
+
+	couponName.innerText = name
+
+	couponRedeem.id = id
+	couponRedeem.innerText = '$'
+	couponRedeem.classList.add('coupon-redeem')
+
+	coupon.classList.add('coupon')
+	coupon.appendChild(couponRedeem)
+	coupon.appendChild(couponName)
+
+	couponsBox.appendChild(coupon)
+}
+function spanGen(parsedKey, element, inputId, type, spanId, labelId) {
+	var span = document.getElementById(spanId),
+		input = document.getElementById(inputId),
+		label = document.getElementById(labelId)
+	input = document.getElementById(inputId)
+
+	if (parsedKey === undefined) {
+		span.classList.add('hidden')
+		span.classList.remove('filled')
+		span.innerHTML = ''
+		if (input) {
+			input.classList.remove('hidden')
+		}
+		if (label) {
+			label.classList.remove('hidden')
+		}
+	}
+
+	if (parsedKey != undefined) {
+		let spanP = document.createElement('p')
+		spanP.innerHTML = parsedKey
+		span.classList.remove('hidden')
+		span.classList.add('filled')
+		span.innerHTML = ''
+		span.appendChild(spanP)
+		if (input) {
+			input.classList.add('hidden')
+		}
+		if (spanId != 'mobileSpan' && spanId != 'pointsSpan') {
+			let img = document.createElement('img')
+			img.setAttributes({
+				src: 'icons/pencil_grey.svg'
+			})
+			img.classList.add('edit-img')
+			span.appendChild(img)
+			img.addEventListener('click', () => {
+				pause()
+				input = document.getElementById(inputId)
+				span = document.getElementById(spanId)
+				label = document.getElementById(labelId)
+				span.classList.add('hidden')
+				label.classList.add('hidden')
+				window.setTimeout(() => {
+					input.classList.remove('hidden')
+				}, 300)
+				input.focus()
+				submitButton.addEventListener('click', () => {
+					input.classList.add('hidden')
+					label.classList.add('hidden')
+					input.value = ''
+					window.setTimeout(() => {
+						span.classList.remove('hidden')
+					}, 300)
+				})
+				refreshButton.addEventListener('click', () => {
+					input.classList.add('hidden')
+					label.classList.add('hidden')
+					input.value = ''
+					window.setTimeout(() => {
+						span.classList.remove('hidden')
+					}, 300)
+				})
+				pauseButton.addEventListener('click', () => {
+					input.classList.add('hidden')
+					label.classList.add('hidden')
+					input.value = ''
+					window.setTimeout(() => {
+						span.classList.remove('hidden')
+					}, 300)
+				})
+			})
+		}
+	} else {
+	}
+	if (span.classList.contains('filled')) {
+		label = document.getElementById(labelId)
+		label.classList.add('hidden')
+	}
+}
 function getStuff() {
+	http.get(
+		`http://www.repleotech.com/gateway/coupons_by_mobile.asp?` +
+			`user_guid=${user}&mobile=${post_mobile[0]}`,
+		res => {
+			let statusCode = res.statusCode, contentType = res.headers['content-type']
+			let error
+			if (statusCode !== 200) {
+				error = new Error('Request Failed.\n' + 'Status Code: ' + statusCode)
+			}
+			if (error) {
+				console.log(error.message)
+				res.resume()
+				return
+			}
+
+			res.setEncoding('utf8')
+			let rawData = ''
+			res.on('data', chunk => {
+				return (rawData += chunk)
+			})
+			res.on('end', () => {
+				if (rawData[0] !== 's') {
+					let coupons = JSON.parse(rawData)
+
+					couponsBox.innerHTML = ''
+					for (var i = 0; i < coupons.length; i++) {
+						let coupon = coupons[i]
+						couponGen(coupon.cc_guid, coupon.coupon_name)
+
+						let _coupon = document.getElementById(coupon.cc_guid)
+
+						_coupon.addEventListener('click', c => {
+							http.get(
+								`http://www.repleotech.com/gateway/coupons_manager.asp?` +
+									`user_guid={${user}}` +
+									`&action=redeem` +
+									`&mobile=${post_mobile[0]}` +
+									`&cc_guid={${c.target.id}}`,
+								_res => {
+									let statusCode = _res.statusCode,
+										contentType = _res.headers['content-type']
+									let error
+									if (statusCode !== 200) {
+										error = new Error(
+											'Request Failed.\n' + 'Status Code: ' + statusCode
+										)
+									}
+									if (error) {
+										console.log(error.message)
+										_res.resume()
+										return
+									}
+								}
+							)
+						})
+					}
+				}
+			})
+		}
+	)
 	http
 		.get(
 			'http://www.repleotech.com/gateway/kiosk_last_checkin.asp?kiosk=' +
@@ -274,94 +453,16 @@ function getStuff() {
 						if (!usedLoyalty) {
 							usedLoyalty = 0
 						}
-						var actualLoyalty = (currentLoyalty - usedLoyalty)
-							console.log(currentLoyalty, usedLoyalty, actualLoyalty)
+						var actualLoyalty = currentLoyalty - usedLoyalty
 
-						if ((actualLoyalty === 1)) {
-							var parsedPoints = actualLoyalty + ' Point '
+						// console.log(currentLoyalty, usedLoyalty, actualLoyalty)
+
+						if (actualLoyalty === 1) {
+							var parsedPoints = actualLoyalty + ' Checkin '
 						} else {
-							var parsedPoints = actualLoyalty + ' Points '
+							var parsedPoints = actualLoyalty + ' Checkins '
 						}
 
-						function spanGen(parsedKey, element, inputId, type, spanId, labelId) {
-							var span = document.getElementById(spanId),
-								input = document.getElementById(inputId),
-								label = document.getElementById(labelId)
-							input = document.getElementById(inputId)
-
-							if (parsedKey === undefined) {
-								span.classList.add('hidden')
-								span.classList.remove('filled')
-								span.innerHTML = ''
-								if (input) {
-									input.classList.remove('hidden')
-								}
-								if (label) {
-									label.classList.remove('hidden')
-								}
-							}
-
-							if (parsedKey != undefined) {
-								let spanP = document.createElement('p')
-								spanP.innerHTML = parsedKey
-								span.classList.remove('hidden')
-								span.classList.add('filled')
-								span.innerHTML = ''
-								span.appendChild(spanP)
-								if (input) {
-									input.classList.add('hidden')
-								}
-								if (spanId != 'mobileSpan' && spanId != 'pointsSpan') {
-									let img = document.createElement('img')
-									img.setAttributes({
-										src: 'icons/pencil_grey.svg'
-									})
-									img.classList.add('edit-img')
-									span.appendChild(img)
-									img.addEventListener('click', () => {
-										pause()
-										input = document.getElementById(inputId)
-										span = document.getElementById(spanId)
-										label = document.getElementById(labelId)
-										span.classList.add('hidden')
-										label.classList.add('hidden')
-										window.setTimeout(() => {
-											input.classList.remove('hidden')
-										}, 300)
-										input.focus()
-										submitButton.addEventListener('click', () => {
-											input.classList.add('hidden')
-											label.classList.add('hidden')
-											input.value = ''
-											window.setTimeout(() => {
-												span.classList.remove('hidden')
-											}, 300)
-										})
-										refreshButton.addEventListener('click', () => {
-											input.classList.add('hidden')
-											label.classList.add('hidden')
-											input.value = ''
-											window.setTimeout(() => {
-												span.classList.remove('hidden')
-											}, 300)
-										})
-										pauseButton.addEventListener('click', () => {
-											input.classList.add('hidden')
-											label.classList.add('hidden')
-											input.value = ''
-											window.setTimeout(() => {
-												span.classList.remove('hidden')
-											}, 300)
-										})
-									})
-								}
-							} else {
-							}
-							if (span.classList.contains('filled')) {
-								label = document.getElementById(labelId)
-								label.classList.add('hidden')
-							}
-						}
 						spanGen(
 							parsedData.firstname,
 							first,
@@ -450,9 +551,9 @@ function getStuff() {
 		})
 }
 getStuff()
-//redeem rewards
 var confirmationPause = false
-pointsButton.addEventListener('click', () => {
+//add coupon
+addCouponButton.addEventListener('click', () => {
 	if (confirmationPause) {
 		confirmationPause = false
 		unPause()
@@ -460,16 +561,59 @@ pointsButton.addEventListener('click', () => {
 		confirmationPause = true
 		pause()
 	}
-	confirmation.classList.toggle('show')
+	confirmationAdd.classList.toggle('show')
 })
-pointsYes.addEventListener('click', () => {
-	cashOut()
+addYes.addEventListener('click', () => {
+	console.log(post_mobile[0])
+	http.get(
+		'http://www.repleotech.com/gateway/coupons_manager.asp?action=issue&' +
+			`user_guid=${user}` +
+			`&mobile=${post_mobile[0]}&coupon_guid=${coupon_guid}`,
+		res => {
+			var statusCode = res.statusCode, contentType = res.headers['content-type']
+			var error
+			if (statusCode !== 200) {
+				error = new Error('Request Failed.\n' + 'Status Code: ' + statusCode)
+			}
+			if (error) {
+				console.log(error.message)
+				res.resume()
+				return
+			}
+			res.setEncoding('utf8')
+			var rawData = ''
+			res.on('data', function(chunk) {
+				console.log((rawData += chunk))
+				getStuff()
+				unPause()
+				confirmationAdd.classList.remove('show')
+			})
+		}
+	)
+})
+addNo.addEventListener('click', () => {
+	confirmationAdd.classList.remove('show')
+	unPause()
+})
+//redeem rewards
+useCouponButton.addEventListener('click', () => {
+	if (confirmationPause) {
+		confirmationPause = false
+		unPause()
+	} else {
+		confirmationPause = true
+		pause()
+	}
+	confirmationRedeem.classList.toggle('show')
+})
+redeemYes.addEventListener('click', () => {
+	// cashOut()
 	getStuff()
 	unPause()
-	confirmation.classList.remove('show')
+	confirmationRedeem.classList.remove('show')
 })
-pointsNo.addEventListener('click', () => {
-	confirmation.classList.remove('show')
+redeemNo.addEventListener('click', () => {
+	confirmationRedeem.classList.remove('show')
 	unPause()
 })
 //bind enter to submit button

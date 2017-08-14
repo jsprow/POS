@@ -1,9 +1,36 @@
-'use strict'
 const electron = require('electron')
 const { app, ipcMain, Menu, BrowserWindow } = require('electron')
 const path = require('path')
 const log = require('electron-log')
 const { autoUpdater } = require('electron-updater')
+const menuTemplate = [
+	{
+		label: 'Application',
+		submenu: [
+			{ label: 'About Application', selector: 'orderFrontStandardAboutPanel:' },
+			{ type: 'separator' },
+			{
+				label: 'Quit',
+				accelerator: 'Command+Q',
+				click: function() {
+					app.quit()
+				}
+			}
+		]
+	},
+	{
+		label: 'Edit',
+		submenu: [
+			{ label: 'Undo', accelerator: 'CmdOrCtrl+Z', selector: 'undo:' },
+			{ label: 'Redo', accelerator: 'Shift+CmdOrCtrl+Z', selector: 'redo:' },
+			{ type: 'separator' },
+			{ label: 'Cut', accelerator: 'CmdOrCtrl+X', selector: 'cut:' },
+			{ label: 'Copy', accelerator: 'CmdOrCtrl+C', selector: 'copy:' },
+			{ label: 'Paste', accelerator: 'CmdOrCtrl+V', selector: 'paste:' },
+			{ label: 'Select All', accelerator: 'CmdOrCtrl+A', selector: 'selectAll:' }
+		]
+	}
+]
 
 require('electron-debug')()
 
@@ -19,6 +46,8 @@ autoUpdater.on('update-downloaded', (ev, info) => {
 })
 
 app.on('ready', () => {
+	const menu = Menu.buildFromTemplate(menuTemplate)
+	Menu.setApplicationMenu(menu)
 	autoUpdater.getFeedURL('dist/latest.yml')
 	autoUpdater.checkForUpdates()
 })

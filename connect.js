@@ -9,24 +9,24 @@ const remote = require('electron').remote,
 	kioskArr = [
 		{
 			name: 'kiosk1',
-			key: '{F88575A4-7484-401B-9890-D69E004925DF}'
-		},
-		{
-			name: 'kiosk2',
-			key: '{02A84516-88E1-4BE7-AD30-F1ACE961BF9D}'
-		},
-		{
-			name: 'kiosk3',
-			key: '{EDDF031C-F147-45FD-8CB6-8FFFF979BF15}'
-		},
-		{
-			name: 'kiosk4',
-			key: '{13DB79E6-787A-46E1-9406-511F12C3CCE3}'
-		},
-		{
-			name: 'kiosk5',
-			key: '{5B5ADCEA-50C3-4DB5-B354-10CFB9896B7A}'
+			key: '{0877CE0C-3A84-4D0E-AE02-81966655B025}'
 		}
+		// ,{
+		// 	name: 'kiosk2',
+		// 	key: '{02A84516-88E1-4BE7-AD30-F1ACE961BF9D}'
+		// },
+		// {
+		// 	name: 'kiosk3',
+		// 	key: '{EDDF031C-F147-45FD-8CB6-8FFFF979BF15}'
+		// },
+		// {
+		// 	name: 'kiosk4',
+		// 	key: '{13DB79E6-787A-46E1-9406-511F12C3CCE3}'
+		// },
+		// {
+		// 	name: 'kiosk5',
+		// 	key: '{5B5ADCEA-50C3-4DB5-B354-10CFB9896B7A}'
+		// }
 	],
 	spans = document.getElementsByClassName('info-span'),
 	first = document.getElementById('first'),
@@ -41,6 +41,10 @@ const remote = require('electron').remote,
 	submitButton = document.getElementById('submitButton'),
 	settingsButton = document.getElementById('settingsButton'),
 	settingsBox = document.getElementById('settingsBox'),
+	userGUIDInput = document.getElementById('userGUIDInput'),
+	couponInput = document.getElementById('couponInput'),
+	keywordInput = document.getElementById('keywordInput'),
+	submitSettings = document.getElementById('submitSettings'),
 	addCouponButton = document.getElementById('addCouponButton'),
 	useCouponButton = document.getElementById('useCouponButton'),
 	addYes = document.getElementById('addYes'),
@@ -57,9 +61,9 @@ const remote = require('electron').remote,
 var post_mobile = [],
 	isPaused = false,
 	inputs = document.getElementsByClassName('input'),
-	user = '{D4B04CA7-E7B6-4E56-B9EF-1BA589D2EF55}',
-	coupon_guid = '{BFA971C7-D403-4067-9C2F-779DBE7E84AD}',
-	keyword = 'wedels',
+	user = '{5CFA7E11-3148-4558-A99C-B475A91B68D0}',
+	coupon_guid = '{AE4C14C4-AF9A-427F-8EF7-1B4A8C3A0A5C}',
+	keyword = 'disctroy',
 	isFirst = false, //isFirst uses the 'state' field
 	kiosk,
 	kioskName,
@@ -73,16 +77,42 @@ var post_mobile = [],
 
 todayString = ('0' + month).slice(-2) + '-' + ('0' + day).slice(-2)
 
+fs.writeFileSync(
+	path + '/user.txt',
+	JSON.stringify({ user: '{5CFA7E11-3148-4558-A99C-B475A91B68D0}', keyword: 'disctroy', coupon: '{AE4C14C4-AF9A-427F-8EF7-1B4A8C3A0A5C}' })
+)
+//populate settings menu
+submitSettings.addEventListener('click', () => {
+	fs.writeFileSync(
+		path + '/user.txt',
+		JSON.stringify({
+			user: userGUIDInput.value,
+			keyword: keywordInput.value,
+			coupon: couponInput.value
+		})
+	)
+})
+
 if (fs.existsSync(path + '/user.txt')) {
-	user = fs.readFileSync(path + '/user.txt')
-	console.log(user)
+	userData = JSON.parse(fs.readFileSync(path + '/user.txt', 'utf8'))
+	user = userData.user
+	keyword = userData.keyword
+	coupon_guid = userData.coupon
+
+	userGUIDInput.placeholder = user
+	keywordInput.placeholder = keyword
+	couponInput.placeholder = coupon_guid
 } else {
-	kiosk = '{D4B04CA7-E7B6-4E56-B9EF-1BA589D2EF55}'
+	user = ''
+	keyword = ''
+	fs.writeFileSync(path + '/user.txt', JSON.stringify({ user: user, keyword: keyword }))
 }
+
 if (fs.existsSync(path + '/kiosk.txt')) {
 	kiosk = fs.readFileSync(path + '/kiosk.txt')
 } else {
-	kiosk = '{9A91681B-7148-460C-9D02-ACBB0455C403}'
+	kiosk = '{0877CE0C-3A84-4D0E-AE02-81966655B025}'
+	fs.writeFileSync(path + '/kiosk.txt', kiosk)
 }
 
 for (var i = 0; i < kioskArr.length; i++) {
@@ -414,7 +444,7 @@ function getStuff() {
 						usedLoyalty = parseFloat(parsedData.address) //uses 'address' field for loyalty points used and finds difference between current loyalty
 
 						if (currentLoyalty == 1) {
-							console.log('currentLoyalty: ' + currentLoyalty)
+							// console.log('currentLoyalty: ' + currentLoyalty)
 							isFirst = true
 							currentLoyalty = parseFloat(currentLoyalty)
 
@@ -441,7 +471,7 @@ function getStuff() {
 									res.setEncoding('utf8')
 									var rawData = ''
 									res.on('data', function(chunk) {
-										console.log((rawData += chunk))
+										// console.log((rawData += chunk))
 									})
 								}
 							)
@@ -457,10 +487,10 @@ function getStuff() {
 
 						// console.log(currentLoyalty, usedLoyalty, actualLoyalty)
 
-						if (actualLoyalty === 1) {
-							var parsedPoints = actualLoyalty + ' Checkin '
+						if (currentLoyalty === 1) {
+							var parsedPoints = currentLoyalty + ' check-in'
 						} else {
-							var parsedPoints = actualLoyalty + ' Checkins '
+							var parsedPoints = currentLoyalty + ' check-ins'
 						}
 
 						spanGen(
@@ -583,7 +613,7 @@ addYes.addEventListener('click', () => {
 			res.setEncoding('utf8')
 			var rawData = ''
 			res.on('data', function(chunk) {
-				console.log((rawData += chunk))
+				// console.log((rawData += chunk))
 				getStuff()
 				unPause()
 				confirmationAdd.classList.remove('show')
@@ -729,7 +759,7 @@ function cashOut() {
 			res.setEncoding('utf8')
 			var rawData = ''
 			res.on('data', function(chunk) {
-				console.log((rawData += chunk))
+				// console.log((rawData += chunk))
 			})
 		}
 	)
@@ -837,7 +867,7 @@ function pushStuff() {
 			res.setEncoding('utf8')
 			var rawData = ''
 			res.on('data', chunk => {
-				console.log((rawData += chunk))
+				// console.log((rawData += chunk))
 			})
 		}
 	)

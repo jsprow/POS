@@ -336,23 +336,30 @@ p.hidden
 {
     overflow-y: scroll;
     flex-flow: column nowrap;
+    min-height: 225px;
+    max-height: 225px;
+
     margin-left: 0;
 }
 .coupon
 {
     display: flex;
+    overflow: hidden;
     align-items: center;
     flex-flow: row nowrap;
 
     width: 100%;
+
+    white-space: nowrap;
+    text-overflow: ellipsis;
 }
 .coupon-redeem
 {
     font-size: 1.2em;
     font-weight: bold;
 
-    margin-left: 0.25em;
-    margin-right: 0.25em;
+    margin-right: .25em;
+    margin-left: .25em;
     padding: 0 .25em;
 
     color: #35bf51;

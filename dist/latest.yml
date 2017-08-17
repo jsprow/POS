@@ -1,7 +1,7 @@
-version: 0.8.1
-releaseDate: '2017-06-20T19:57:50.056Z'
-githubArtifactName: rewards_app-setup-0.8.1.exe
-path: Rewards App Setup 0.8.1.exe
+version: 0.8.3
+releaseDate: '2017-08-14T20:11:29.267Z'
+githubArtifactName: rewards_app-setup-0.8.3.exe
+path: Rewards App Setup 0.8.3.exe
 sha512: >-
-  53879aa19063f96c0db1eda9f92021640e04a11cea50f18bbdec3bac0a1b47c8093c9d88ac08f1ae30da6e3450550cf0b5d71f9304af9d8cdff460a53b5448e6
-sha2: 55bdb074b0a30556bdd23c9cf97e728fc7f21c9f7d936f57a1b3404142893a9f
+  0005d9cf2b8718340fdf67b5cdeddaeee03b756341e37df945a1ef669ef634c166453117e8becd69929e409963af212ba1b37ca403dd36818c35184098bac29d
+sha2: 31f5a017d6413ce43376aa2c7602264c9274162e63fb4fd7863826e7adfb98d0
